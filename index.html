@@ -412,8 +412,8 @@ for (const k of TK){
 const AB = {
   fed:{ name:'Артналёт 122 мм', cost:40, cd:90, delay:10, shells:8, scatter:55, r:24, dmg:40, pen:25, bdmg:130,
     desc:'Батарея 2С1 «Гвоздика». Снаряды ложатся через 10 секунд с большим рассеиванием и бьют по всем, включая своих.' },
-  chr:{ name:'Миномёт 82 мм', cost:20, cd:60, delay:6, shells:5, scatter:40, r:14, dmg:28, pen:10, bdmg:48,
-    desc:'Мобильный миномётный расчёт. Слабее артиллерии, зато быстрее.' }
+  chr:{ name:'Миномёт 82 мм', charges:2, cost:20, cd:60, delay:6, shells:5, scatter:40, r:14, dmg:28, pen:10, bdmg:48,
+    desc:'Мобильный миномётный расчёт: два налёта подряд, затем перезарядка. Слабее артиллерии, зато быстрее.' }
 };
 const AB2 = {
   fed:{ name:'Дымовые снаряды', cost:15, cd:45, delay:9, shells:4, scatter:40, r:42, life:60 },
@@ -916,8 +916,9 @@ function applyCommand(g, side, c){
     }
     case 'ability': {
       if (g.phase !== 'battle') return; const A = AB[side];
-      if (S.cd > 0 || S.pts < A.cost) return;
-      S.pts -= A.cost; S.cd = A.cd;
+      if (S.ch === undefined) S.ch = A.charges || 1;
+      if (S.ch <= 0 || S.pts < A.cost) return;
+      S.pts -= A.cost; S.ch--; if (S.ch <= 0) S.cd = A.cd;
       for (let i = 0; i < A.shells; i++) g.shells.push({ x:c.x + gauss()*A.scatter*1.6, y:c.y + gauss()*A.scatter*1.6, t:g.t + A.delay + i*.55, side, A });
       g.artyMarks.push({ side, x:c.x, y:c.y, t:g.t + A.delay, end:g.t + A.delay + A.shells*.55 + .5 });
       return;
@@ -1230,7 +1231,7 @@ function step(g, dt){
     return;
   }
   g.t += dt; g.phaseT -= dt;
-  for (const s of SIDES){ const S = g.sides[s]; S.pts += S.inc*dt; if (S.cd > 0) S.cd -= dt; if (S.cd2 > 0) S.cd2 -= dt; if (S.cd3 > 0) S.cd3 -= dt; }
+  for (const s of SIDES){ const S = g.sides[s]; S.pts += S.inc*dt; if (S.cd > 0){ S.cd -= dt; if (S.cd <= 0) S.ch = AB[s].charges || 1; } if (S.ch === undefined) S.ch = AB[s].charges || 1; if (S.cd2 > 0) S.cd2 -= dt; if (S.cd3 > 0) S.cd3 -= dt; }
   g.smokes = g.smokes.filter(s => s.until > g.t); g.flares = g.flares.filter(f => f.until > g.t);
   // подкрепления
   for (const a of g.arrivals.filter(a => a.at <= g.t)){
@@ -1476,7 +1477,7 @@ function aiStep(g, side, dt, st){
       for (let tr = 0; tr < 12; tr++){ const x = ob.x + gauss()*350, y = ob.y + gauss()*350; if (infilOk(g, side, k, x, y)){ applyCommand(g, side, { c:'buy', type:k, x, y }); break; } }
     } else applyCommand(g, side, { c:'buy', type:k });
   } }
-  if (S.cd <= 0 && S.pts > AB[side].cost + 25){
+  if ((S.ch === undefined || S.ch > 0) && S.pts > AB[side].cost + 25){
     const en = g.units.filter(u => u.side !== side && u.vis[side]);
     let best = null, bn = 1;
     for (const e of en){ const n = en.filter(x => dist(x, e) < 70).length; const own = g.units.filter(x => x.side === side && dist(x, e) < 90).length; if (n > bn && !own){ bn = n; best = e; } }
@@ -1521,7 +1522,7 @@ function aiStep(g, side, dt, st){
 }
 
 /* ================= СНИМОК СОСТОЯНИЯ ================= */
-function sideSnap(g, s){ const S = g.sides[s]; return { p:Math.floor(S.pts), i:S.inc, s:Math.floor(S.score), cd:Math.max(0, Math.ceil(S.cd)), used:S.used, r:S.ready, lv:S.lostVal, lm:S.lostMen, lvh:S.lostVeh, ck:S.civK, cd2:Math.max(0, Math.ceil(S.cd2)), cd3:Math.max(0, Math.ceil(S.cd3)), eng:S.eng, arr:g.arrivals.filter(a => a.side === s).length }; }
+function sideSnap(g, s){ const S = g.sides[s]; return { p:Math.floor(S.pts), i:S.inc, s:Math.floor(S.score), cd:Math.max(0, Math.ceil(S.cd)), ch:S.ch === undefined ? (AB[s].charges || 1) : S.ch, used:S.used, r:S.ready, lv:S.lostVal, lm:S.lostMen, lvh:S.lostVeh, ck:S.civK, cd2:Math.max(0, Math.ceil(S.cd2)), cd3:Math.max(0, Math.ceil(S.cd3)), eng:S.eng, arr:g.arrivals.filter(a => a.side === s).length }; }
 function encodeSnap(g, ev){
   return { ph:g.phase, pt:Math.round(g.phaseT*10)/10, t:Math.round(g.t*100)/100,
     S:{ fed:sideSnap(g, 'fed'), chr:sideSnap(g, 'chr') },
@@ -1613,14 +1614,63 @@ function drawGrid(x, w, h){
 /* ---------- Объёмные дома: стены с окнами и поднятые крыши, отдельным слоем ---------- */
 const FLOOR_M = 3.1;
 const bldH = (map, i) => map.t[i] === T.BLD && map.fl ? map.fl[i]*FLOOR_M : 0;
+// груда обломков на месте обрушенной части дома, иногда с огрызком стены
+function drawRubbleHeap(x, map, i){
+  const W = map.W, X = i % W, Y = Math.floor(i/W), px = X*CELL, py = Y*CELL, fl = map.fl[i], wn = map.winter;
+  const hh = FLOOR_M*(1 + Math.min(fl, 4)*.35), base = py + CELL;
+  // огрызок стены у высоких домов
+  if (fl >= 4 && hr(i, 71) < .45){
+    const sw = 4 + hr(i, 72)*6, sx = px + hr(i, 73)*(CELL - sw), sh = fl*FLOOR_M*(.25 + hr(i, 74)*.35);
+    x.fillStyle = wn ? '#9c9d99' : '#6f6958'; x.beginPath(); x.moveTo(sx, base - 2); x.lineTo(sx, base - sh);
+    x.lineTo(sx + sw*.4, base - sh + 2 + hr(i, 75)*4); x.lineTo(sx + sw*.7, base - sh - 1); x.lineTo(sx + sw, base - sh + 3 + hr(i, 76)*5); x.lineTo(sx + sw, base - 2); x.closePath(); x.fill();
+    x.fillStyle = '#1b1916';
+    for (let f = 1; f*FLOOR_M < sh - 2; f++) x.fillRect(sx + 1, base - f*FLOOR_M - 1.6, Math.max(1.5, sw - 2), 1.3);
+  }
+  // сама груда: неровный гребень
+  const cols = wn ? ['#b9b6ad', '#9d998f', '#c9c7c0'] : ['#8e8574', '#776f60', '#a0967f', '#8a6a52'];
+  x.fillStyle = cols[0]; x.beginPath(); x.moveTo(px - 1, base);
+  for (let k = 0; k <= 6; k++){ const tx = px + k*CELL/6, th = hh*(.45 + hr(i, 80 + k)*.55)*(k === 0 || k === 6 ? .4 : 1); x.lineTo(tx, base - th); }
+  x.lineTo(px + CELL + 1, base); x.closePath(); x.fill();
+  for (let k = 0; k < 9; k++){
+    x.fillStyle = cols[Math.floor(hr(i, 90 + k)*cols.length)]; const sz = 2 + hr(i, 100 + k)*4;
+    x.fillRect(px + hr(i, 110 + k)*(CELL - sz), base - hr(i, 120 + k)*hh*.8 - sz*.5, sz, sz*.7);
+  }
+  x.strokeStyle = '#3a342b'; x.lineWidth = .8; x.beginPath();
+  for (let k = 0; k < 3; k++){ const rx = px + 3 + hr(i, 130 + k)*14, ry = base - hr(i, 133 + k)*hh*.7; x.moveTo(rx, ry); x.lineTo(rx + (hr(i, 136 + k) - .5)*6, ry - 3 - hr(i, 139 + k)*3); }
+  x.stroke();
+  if (wn){ x.fillStyle = 'rgba(245,247,247,.7)'; for (let k = 0; k < 4; k++) x.fillRect(px + hr(i, 150 + k)*16, base - hh*(.5 + hr(i, 154 + k)*.4), 3, 1.2); }
+}
+// разлом: у дома обрушилась южная часть — видны перекрытия, комнаты, арматура
+function drawExposedWall(x, map, i, top, hh, px, py, fl){
+  const wn = map.winter, base = py + CELL;
+  x.fillStyle = wn ? '#4a4c4b' : '#35312a'; x.fillRect(px, top, CELL, hh);
+  for (let f = 0; f <= fl; f++){
+    const y = base - f*FLOOR_M; if (y < top - .5) break;
+    const gap = hr(i, 200 + f) < .3, gx = px + hr(i, 210 + f)*12;
+    x.fillStyle = wn ? '#a5a7a4' : '#8c8576';
+    if (gap){ x.fillRect(px, y - .9, gx - px, .9); x.fillRect(gx + 5, y - .9, px + CELL - gx - 5, .9);
+      x.strokeStyle = '#6b5a4a'; x.lineWidth = .6; x.beginPath(); x.moveTo(gx, y - .5); x.lineTo(gx + 2, y + 1.5); x.moveTo(gx + 5, y - .5); x.lineTo(gx + 3.5, y + 2); x.stroke(); }
+    else x.fillRect(px, y - .9, CELL, .9);
+    if (f < fl){
+      x.fillStyle = 'rgba(0,0,0,.45)';
+      for (let k = 0; k < 2; k++){ const wx = px + 3 + hr(i, 220 + f*3 + k)*13; x.fillRect(wx, y - FLOOR_M + .2, .8, FLOOR_M - 1.1); }
+      if (hr(i, 240 + f) < .25){ x.fillStyle = wn ? '#707371' : '#5a5143'; x.fillRect(px + hr(i, 250 + f)*14, y - 1.8, 3, .9); }
+    }
+  }
+  x.fillStyle = wn ? '#bcbdb9' : '#766e5d';
+  x.beginPath(); x.moveTo(px, top); for (let k = 0; k <= 5; k++) x.lineTo(px + k*CELL/5, top + hr(i, 260 + k)*2.2); x.lineTo(px + CELL, top); x.closePath(); x.fill();
+}
 function drawTallCell(x, map, i){
+  if (map.t[i] === T.RUBBLE && map.fl && map.fl[i] > 0){ drawRubbleHeap(x, map, i); return; }
   if (map.t[i] !== T.BLD) return;
   const W = map.W, X = i % W, Y = Math.floor(i/W), px = X*CELL, py = Y*CELL, H = bldH(map, i), wn = map.winter;
   const res = map.res[i], dmg = map.bst ? map.bst[i] : 0, fl = map.fl ? map.fl[i] : 1;
   const at = (dx, dy) => { const xx = X+dx, yy = Y+dy; return xx >= 0 && yy >= 0 && xx < W && yy < map.H ? yy*W+xx : -1; };
   const isB = j => j >= 0 && map.t[j] === T.BLD, sH = at(0, 1);
   // южная стена видна, если южнее нет такого же дома
-  if (!isB(sH) || bldH(map, sH) < H){
+  const exposed = sH >= 0 && map.t[sH] === T.RUBBLE && map.fl && map.fl[sH] > 0;
+  if (exposed){ drawExposedWall(x, map, i, py + CELL - H, H, px, py, fl); }
+  else if (!isB(sH) || bldH(map, sH) < H){
     const top = py + CELL - H, hh = isB(sH) ? H - bldH(map, sH) : H;
     const wall = wn ? (res ? '#a9aaa5' : '#8d8f8b') : res ? '#7a7463' : '#57503f';
     x.fillStyle = shade(wall, dmg ? .85 : 1); x.fillRect(px, top, CELL, hh);
@@ -1790,6 +1840,10 @@ const MODEL_DEF = {
       [3.8, 5.4, -4, 4, 1.6, 2.8, 'light'], [-8, -6, -3.6, -.8, 3, 3.4, 'dark'], [-8, -6, .8, 3.6, 3, 3.4, 'dark'] ],
     tx:1, tz:3, barrel:10, turret:[ [-2.2, 2, -2, 2, 0, 1.5, 'hull'], [-1.4, 1, -1.3, 1.3, 1.5, 2.1, 'light'], [-.8, .8, -2, 2, 1.5, 1.9, 'stripe'],
       [2, 10, -.35, .35, .6, 1.3, 'metal'], [-1, 3, 2, 2.9, 1.2, 2.1, 'metal'] ] },
+  cmd:{ hull:[ ...wheels([-6.5, -3, 1.5, 5], 3.5, 2), [-8.6, 7, -3, 3, 1, 3, 'hull'], [7, 9.4, -2.2, 2.2, 1, 2.3, 'light'], [9.4, 10, -1.2, 1.2, 1, 1.8, 'light'],
+      [-7.6, 3.6, -2.6, 2.6, 3, 4.4, 'light'], [-7.2, 3.2, -2.2, 2.2, 4.4, 4.7, 'hull'], [3.6, 6.4, -2.4, 2.4, 3, 3.6, 'dark'],
+      [-6.8, -5.2, -1.8, -.8, 4.7, 5.4, 'metal'], [-6.8, -5.2, .8, 1.8, 4.7, 5.4, 'metal'], [1.4, 2.6, -2.4, -1.4, 4.7, 5.3, 'metal'],
+      [-4.4, 0, -.3, .3, 4.7, 5.1, 'dark'], [-3.2, -1.4, -2.9, 2.9, 4.7, 5, 'stripe'] ] },
   apc:{ hull:[ ...wheels([-6, -2.5, 2.5, 6], 3.6, 2), [-9, 8, -3, 3, 1, 3, 'hull'], [8, 9.3, -2.5, 2.5, 1, 2.4, 'light'],
       [-8, 6, -2.5, 2.5, 3, 3.8, 'light'], [-8.5, -7, -1.5, 1.5, 3, 3.5, 'dark'] ],
     tx:2, tz:3.8, barrel:7.5, turret:[ [-1.4, 1.4, -1.4, 1.4, 0, 1.3, 'hull'], [-.6, .6, -1.4, 1.4, .6, 1.3, 'stripe'], [1.4, 7.5, -.35, .35, .4, 1, 'metal'] ] },
@@ -1801,7 +1855,7 @@ const MODEL_DEF = {
   tech:{ hull:truckBody(false), tx:-3, tz:2.5, barrel:7, turret:[ [-1.6, 1.6, -1.6, 1.6, 0, .9, 'metal'], [-1.6, -.6, -.6, .6, .9, 2.2, 'dark'],
       [1, 7, -.9, -.45, .6, 1.1, 'metal'], [1, 7, .45, .9, .6, 1.1, 'metal'], [.2, 1.6, -1.2, 1.2, .6, 1.6, 'dark'] ] }
 };
-const MODEL_OF = { f_t72b:'tank72b', f_cmd:'apc', f_btr:'apc', f_bmp:'ifv', f_t72:'tank', f_t80:'tank80', f_zsu:'aa', f_ural:'truck', f_conv:'truck', c_t72:'tank', c_btr:'apc', c_zu:'tech', c_sup:'truck' };
+const MODEL_OF = { f_t72b:'tank72b', f_cmd:'cmd', f_btr:'apc', f_bmp:'ifv', f_t72:'tank', f_t80:'tank80', f_zsu:'aa', f_ural:'truck', f_conv:'truck', c_t72:'tank', c_btr:'apc', c_zu:'tech', c_sup:'truck' };
 function shade(hex, f){ const n = parseInt(hex.slice(1), 16); const r = clamp(Math.round((n >> 16)*f), 0, 255), g = clamp(Math.round(((n >> 8) & 255)*f), 0, 255), b = clamp(Math.round((n & 255)*f), 0, 255); return `rgb(${r},${g},${b})`; }
 function buildStack(boxes, pal){
   let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity, z1 = 0;
@@ -2487,6 +2541,17 @@ function drawUnit(u, now, models, s){
     drawVehicle(ctx, key, u.side, u.rx, u.ry, u.rh, u.rta, ws, 1);
     const m = MODEL_DEF[key];
     top = ((m.tz || 3) + 3)*ws*LZ + 4*ws;
+    if (u.type === 'f_cmd'){
+      // антенны КШМ: высокие штыри и рамка — главное, чем она отличается от БТР
+      const baseZ = 4.9*ws*LZ, c = Math.cos(u.rh), sn = Math.sin(u.rh);
+      const ants = [[-6, -1.3, 24], [-6, 1.3, 20], [2, -1.9, 16], [-1.5, 0, 11]];
+      ctx.strokeStyle = '#1e1f1c'; ctx.lineWidth = Math.max(.9/APP.cam.z, ws*.22);
+      for (const [ax, ay, L] of ants){ const bx = u.rx + c*ax*ws - sn*ay*ws, by = u.ry + sn*ax*ws + c*ay*ws - baseZ;
+        ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx + ws*.8, by - L*ws*.9); ctx.stroke(); }
+      const fx = u.rx + c*1.5*ws, fy = u.ry + sn*1.5*ws - baseZ;
+      ctx.beginPath(); ctx.rect(fx - 2.2*ws, fy - 3.4*ws, 4.4*ws, 2.4*ws); ctx.stroke();
+      top = Math.max(top, 26*ws);
+    }
     drawFlag(ctx, u.side, u.rx - Math.cos(u.rh)*5*ws, u.ry - Math.sin(u.rh)*5*ws - (m.tz || 3)*ws*LZ, ws);
   } else {
     const men = Math.max(1, Math.ceil(u.hp/(d.hp/d.men))), slots = squadSlots(u.id, men);
@@ -3081,7 +3146,7 @@ function toggleAbility(kind){
   const v = APP.view, S = v.sides[APP.side];
   if (v.phase !== 'battle'){ toast('Доступно после начала боя'); return; }
   if (kind === 'flare' && !v.night){ toast('Осветительные ракеты нужны только ночью'); return; }
-  const cd = kind === 'smoke' ? S.cd2 : kind === 'flare' ? S.cd3 : S.cd, cost = kind === 'smoke' ? AB2[APP.side].cost : kind === 'flare' ? FLARE.cost : AB[APP.side].cost;
+  const cd = kind === 'smoke' ? S.cd2 : kind === 'flare' ? S.cd3 : (S.ch > 0 ? 0 : S.cd), cost = kind === 'smoke' ? AB2[APP.side].cost : kind === 'flare' ? FLARE.cost : AB[APP.side].cost;
   if (cd > 0){ toast('Перезарядка: ' + cd + ' с'); return; }
   if (S.p < cost){ toast('Нужно ' + cost + ' очков'); return; }
   APP.targeting = APP.targeting === kind ? false : kind; APP.placing = null; updateHud();
@@ -3171,7 +3236,8 @@ function updateHud(){
   $('#h-me').textContent = 'Вы: ' + SIDE_NAME[me]; $('#h-me').className = 'me ' + me;
   $('#h-pts').textContent = S.p + ' очков, +' + S.i.toFixed(1) + ' в секунду' + (S.arr ? ', в пути: ' + S.arr : '');
   const ready = $('#b-ready'); ready.hidden = v.phase !== 'deploy'; ready.textContent = S.r ? 'Готов, ждём соперника' : 'Готов к бою'; ready.classList.toggle('on', !!S.r);
-  const ab = $('#b-ab'); ab.hidden = v.phase !== 'battle'; ab.textContent = AB[me].name + (S.cd > 0 ? ' (' + S.cd + ' с)' : ', ' + AB[me].cost + ' оч.') + ' [Q]'; ab.classList.toggle('on', APP.targeting === 'arty'); ab.disabled = S.cd > 0;
+  const ab = $('#b-ab'); ab.hidden = v.phase !== 'battle'; const chMax = AB[me].charges || 1, ch = S.ch === undefined ? chMax : S.ch;
+  ab.textContent = AB[me].name + (chMax > 1 ? ' ' + ch + '/' + chMax : '') + (ch <= 0 ? ' (' + S.cd + ' с)' : ', ' + AB[me].cost + ' оч.') + ' [Q]'; ab.classList.toggle('on', APP.targeting === 'arty'); ab.disabled = ch <= 0;
   const as = $('#b-asmoke'); as.hidden = v.phase !== 'battle'; as.textContent = AB2[me].name + (S.cd2 > 0 ? ' (' + S.cd2 + ' с)' : ', ' + AB2[me].cost + ' оч.') + ' [Z]'; as.classList.toggle('on', APP.targeting === 'smoke'); as.disabled = S.cd2 > 0;
   const fl = $('#b-flare'); fl.hidden = v.phase !== 'battle' || !v.night; fl.textContent = 'Ракета' + (S.cd3 > 0 ? ' (' + S.cd3 + ' с)' : ', ' + FLARE.cost + ' оч.') + ' [E]'; fl.classList.toggle('on', APP.targeting === 'flare'); fl.disabled = S.cd3 > 0;
   const so = selOwn();
