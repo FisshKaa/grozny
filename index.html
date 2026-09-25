@@ -33,6 +33,17 @@ button.go:hover:not(:disabled){background:#806a31}
 .title{text-shadow:0 2px 10px rgba(0,0,0,.5);font-family:var(--s);font-weight:700;font-size:clamp(44px,8vw,96px);line-height:.95;margin:0;letter-spacing:-.01em}
 .title small{display:block;font-size:.34em;font-weight:400;font-style:italic;letter-spacing:0;margin-top:14px;color:#d8d2ba}
 .lede{text-shadow:0 1px 4px #000;font-family:var(--s);font-size:18px;line-height:1.55;max-width:34em;color:#d6d1bd;margin:22px 0 0}
+.menu-col{display:flex;flex-direction:column;gap:12px}
+.patch{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:12px 16px;max-height:38vh;overflow:auto}
+.patch-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:17px}
+.patch-h button{padding:2px 10px;font-size:14px}
+.patch h4{margin:2px 0 2px;font-size:17px}
+.patch time{color:var(--brass);font-size:14px}
+.patch ul{margin:6px 0 0;padding-left:18px;font-family:var(--s);font-size:14.5px;line-height:1.5}
+.patch .older{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.patch .older summary{cursor:pointer;color:var(--mute)}
+.patch .older div{margin:8px 0}
+.patch a{color:var(--brass)}
 .menu-actions{display:flex;flex-direction:column;gap:10px;background:var(--panel);border:1px solid var(--line);padding:18px;border-radius:4px}
 .menu-actions button{text-align:left;padding:12px 14px;font-size:19px}
 .menu-actions p{margin:6px 0 0;color:var(--mute);font-size:14px}
@@ -152,6 +163,14 @@ body.replay #mu-now{display:block}
 </style>
 </head>
 <body>
+<script>
+/* ===== Настройки патчноута =====
+   Впишите свой публичный репозиторий GitHub в виде 'ник/репозиторий'.
+   На GitHub Pages можно оставить пустым — определится по адресу. */
+window.GAME_REPO = 'FisshKaa/grozny';
+window.GAME_FILE = 'index.html';   // путь к файлу игры внутри репозитория
+window.GAME_BRANCH = 'https://github.com/FisshKaa/grozny';           // ветка; пусто — ветка по умолчанию
+</script>
 <canvas id="cv" aria-label="Тактическая карта"></canvas>
 
 <div id="hud" hidden>
@@ -215,6 +234,7 @@ body.replay #mu-now{display:block}
       <h1 class="title">Грозный<br>1994–1996<small>Тактика первой чеченской войны для двух игроков</small></h1>
       <p class="lede">Расставьте силы, возьмите ключевые здания и удержите их. Техника без пехоты слепа, гранатомётчик на пятом этаже опаснее танка, а артиллерия не выбирает, куда упасть: ни своих, ни чужих, ни тех, кто прячется в подвалах.</p>
     </div>
+    <div class="menu-col">
     <div class="menu-actions">
       <button id="m-host" class="go">Создать лобби</button>
       <button id="m-join">Подключиться по коду</button>
@@ -222,6 +242,11 @@ body.replay #mu-now{display:block}
       <button id="m-help">Как играть</button>
       <button id="m-music">Музыка</button>
       <p>Карты схематичны, характеристики упрощены. Сценарии основаны на реальных событиях 1994–1996 годов.</p>
+    </div>
+    <div class="patch" id="patch" aria-live="polite">
+      <div class="patch-h"><b>Последнее обновление</b><button id="patch-refresh" title="Проверить заново">Обновить</button></div>
+      <div id="patch-body"><p class="meta">Загружаем…</p></div>
+    </div>
     </div>
   </section>
 
@@ -3530,6 +3555,78 @@ $('#mu-vol').addEventListener('input', e => { MUS.vol = e.target.value/100; MUS.
 $('#mu-close').onclick = () => { $('#music').hidden = true; };
 $('#b-music').onclick = openMusic; $('#m-music').onclick = openMusic; $('#mu-now').onclick = openMusic;
 musLoad();
+
+/* ---------- Патчноут из коммитов GitHub ---------- */
+const PATCH_FALLBACK = { date:'2026-09-25', title:'Разрушенные дома, КШМ, миномёт ВС ЧРИ', notes:[
+  'У КШМ Р-145БМ своя модель с антеннами, её легко отличить от БТР-80',
+  'Обрушенная часть дома показывает перекрытия и комнаты, на месте рухнувших клеток — груды обломков',
+  'Миномёт ВС ЧРИ: два налёта подряд, потом перезарядка' ] };
+function patchRepo(){
+  const r = (window.GAME_REPO || '').trim().replace(/^https?:\/\/github\.com\//i, '').replace(/\.git$/, '').replace(/\/+$/, '');
+  if (/^[\w.-]+\/[\w.-]+$/.test(r)) return r;
+  const m = location.hostname.match(/^([\w-]+)\.github\.io$/i);
+  if (!m) return null;
+  const seg = location.pathname.split('/').filter(Boolean)[0];
+  return m[1] + '/' + (seg && !/\.html?$/i.test(seg) ? seg : m[1] + '.github.io');
+}
+const fmtDate = iso => { try { return new Date(iso).toLocaleDateString('ru-RU', { day:'numeric', month:'long', year:'numeric' }); } catch(e){ return iso; } };
+function patchEntry(title, date, notes, url){
+  const d = document.createElement('div');
+  const t = document.createElement('time'); t.textContent = fmtDate(date); d.appendChild(t);
+  const h = document.createElement('h4'); h.textContent = title; d.appendChild(h);
+  if (notes.length){ const ul = document.createElement('ul'); for (const n of notes){ const li = document.createElement('li'); li.textContent = n; ul.appendChild(li); } d.appendChild(ul); }
+  if (url){ const a = document.createElement('a'); a.href = url; a.target = '_blank'; a.rel = 'noopener'; a.textContent = 'Коммит на GitHub'; a.style.fontSize = '13px'; d.appendChild(a); }
+  return d;
+}
+function parseCommit(msg){
+  const lines = (msg || '').split(/\r?\n/).map(s => s.trim());
+  const title = lines.shift() || 'Обновление';
+  const notes = lines.filter(Boolean).map(s => s.replace(/^[-*•–]\s*/, ''));
+  return { title, notes };
+}
+function renderPatch(list, note){
+  const box = $('#patch-body'); box.innerHTML = '';
+  if (!list.length){ box.textContent = note || 'Обновлений пока нет.'; return; }
+  const [first, ...rest] = list;
+  box.appendChild(patchEntry(first.title, first.date, first.notes, first.url));
+  if (rest.length){
+    const det = document.createElement('details'); det.className = 'older';
+    const sm = document.createElement('summary'); sm.textContent = 'Предыдущие обновления'; det.appendChild(sm);
+    for (const e of rest) det.appendChild(patchEntry(e.title, e.date, e.notes, e.url));
+    box.appendChild(det);
+  }
+  if (note){ const p = document.createElement('p'); p.className = 'meta'; p.style.fontSize = '13px'; p.textContent = note; box.appendChild(p); }
+}
+async function loadPatch(force){
+  const repo = patchRepo();
+  if (!repo){
+    renderPatch([{ ...PATCH_FALLBACK, url:null }], 'Чтобы здесь показывались коммиты, впишите репозиторий в GAME_REPO в начале index.html.');
+    return;
+  }
+  const key = 'grz-patch:' + repo + ':' + (window.GAME_FILE || '');
+  let cached = null; try { cached = JSON.parse(localStorage.getItem(key) || 'null'); } catch(e){}
+  if (cached && !force && Date.now() - cached.t < 10*60*1000){ renderPatch(cached.list); return; }
+  if (cached) renderPatch(cached.list, 'Проверяем обновления…');
+  const q = new URLSearchParams({ per_page:'6' });
+  if (window.GAME_FILE) q.set('path', window.GAME_FILE);
+  if (window.GAME_BRANCH) q.set('sha', window.GAME_BRANCH);
+  try {
+    const r = await fetch('https://api.github.com/repos/' + repo + '/commits?' + q, { headers:{ Accept:'application/vnd.github+json' } });
+    if (!r.ok){
+      const why = r.status === 404 ? 'репозиторий не найден или он приватный' : r.status === 403 ? 'GitHub временно ограничил запросы, попробуйте через час' : 'ошибка ' + r.status;
+      if (cached) renderPatch(cached.list, 'Не удалось обновить: ' + why + '.'); else renderPatch([], 'Не удалось загрузить патчноут: ' + why + '.');
+      return;
+    }
+    const data = await r.json();
+    const list = data.map(c => { const p = parseCommit(c.commit && c.commit.message); return { title:p.title, notes:p.notes, date:(c.commit.committer || c.commit.author).date, url:c.html_url }; });
+    try { localStorage.setItem(key, JSON.stringify({ t:Date.now(), list })); } catch(e){}
+    renderPatch(list);
+  } catch(e){
+    if (cached) renderPatch(cached.list, 'Нет связи с GitHub, показана сохранённая версия.'); else renderPatch([{ ...PATCH_FALLBACK, url:null }], 'Нет связи с GitHub.');
+  }
+}
+$('#patch-refresh').onclick = () => loadPatch(true);
+loadPatch(false);
 
 showScreen('main');
 setLogFilter('all');
