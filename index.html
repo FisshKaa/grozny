@@ -105,6 +105,7 @@ input{font:inherit;font-size:28px;letter-spacing:.2em;text-transform:uppercase;w
 #b-res{position:fixed;left:50%;top:64px;transform:translateX(-50%)}
 #round{position:fixed;inset:0;display:grid;place-items:center;padding:20px;background:rgba(20,22,24,.55);pointer-events:none}
 #round .box{max-width:620px;pointer-events:auto}#round table{border-collapse:collapse;width:100%;margin:10px 0}#round th,#round td{padding:5px 8px;border-bottom:1px solid var(--line);text-align:right}#round th:first-child{text-align:left}
+.deck-n{margin:0 6px 6px;font-size:13.5px;color:var(--mute);line-height:1.3}
 .deck-h{margin:10px 4px 6px;color:var(--brass);font-size:14px}
 .card.eng{border-style:dashed}
 .opts{display:flex;gap:18px;flex-wrap:wrap;margin:6px 0 4px}
@@ -159,6 +160,7 @@ input{font:inherit;font-size:28px;letter-spacing:.2em;text-transform:uppercase;w
     <button id="b-flare" hidden></button>
     <button id="b-smoke" hidden>Дым [G]</button>
     <button id="b-unload" hidden>Высадить [U]</button>
+    <button id="b-afire" hidden>Огонь по точке [T]</button>
   </div>
   <div id="toasts" aria-live="polite"></div>
 </div>
@@ -229,6 +231,7 @@ input{font:inherit;font-size:28px;letter-spacing:.2em;text-transform:uppercase;w
         <dt>Z</dt><dd>дымовые снаряды или мины по точке на карте</dd>
         <dt>G</dt><dd>дым у выбранных: «Туча» у танков и БТР, РДГ-2 у пехоты</dd>
         <dt>E</dt><dd>осветительная ракета (ночью)</dd>
+        <dt>T</dt><dd>огонь по точке: выбранные бьют по дому или месту, даже не видя противника</dd>
         <dt>Правая по БТР или БМП</dt><dd>посадить выбранную пехоту на броню; U — высадить</dd>
         <dt>1–9, 0</dt><dd>карточки колоды</dd>
         <dt>WASD, стрелки</dt><dd>двигать карту; колесо — масштаб; средняя кнопка или пробел с левой — перетаскивание</dd>
@@ -244,7 +247,9 @@ input{font:inherit;font-size:28px;letter-spacing:.2em;text-transform:uppercase;w
       <p>Город разрушается. Тяжёлые снаряды и артиллерия обрушивают дома в щебень: через завалы проходят пехота и гусеничная техника, а за обломками можно укрыться. В городе остаются мирные жители. Они прячутся в домах и уходят от боёв, но артиллерия и обрушения их убивают. За каждого погибшего от вашего огня снимаются очки.</p>
       <p>Бой может идти в два этапа. В первом один игрок атакует, другой обороняется, во втором вы меняетесь сторонами на той же карте: руины, воронки, остовы и павшие остаются. Побеждает тот, у кого больше очков за оба этапа.</p>
       <p>Ночью видимость примерно вдвое меньше, а каждый выстрел выдаёт стрелка вспышкой. Осветительная ракета снимает темноту в большом круге для обеих сторон. Зимой колёсная техника вязнет в снегу вне дорог, а гусеницы оставляют следы.</p>
-      <p>При расстановке можно ставить баррикады и противотанковые мины. Баррикада перекрывает улицу технике и даёт укрытие пехоте. Мину противник не видит, пока её не найдут его сапёры или пехота рядом. Сапёры находят мины в радиусе 70 м, снимают их и разбирают баррикады, если остановить их рядом. Танк, наехавший на мину, обычно остаётся на месте с разбитой ходовой, но продолжает стрелять.</p>
+      <p>Пехота ВС ЧРИ может вставать и выходить из подвалов любых жилых домов, если рядом нет противника: при расстановке дальше 250 м от его зоны, в бою дальше 220 м от его отрядов. Подходящие дома подсвечиваются. Во время боя щёлкните карточку пехоты и затем дом; второй щелчок по карточке вызывает отряд с края карты.</p>
+      <p>Бойцы на верхних этажах нарисованы на «срезе» над крышей. Пушка танка не поднимается на верхние этажи ближе 70 м: у выбранного танка эта зона обведена красным. Невидимого стрелка выдаёт вспышка; по его дому можно ударить огнём по точке (T). Подбитые машины остаются остовами, через которые техника не проедет, а пехота за ними укрывается.</p>
+      <p>Мины и баррикады ставит только обороняющийся, в любом месте не ближе 200 м к зоне противника. Атакующие федералы получают сапёров. Баррикада перекрывает улицу технике и даёт укрытие пехоте. Мину противник не видит, пока её не найдут его сапёры или пехота рядом. Сапёры находят мины в радиусе 70 м, снимают их и разбирают баррикады, если остановить их рядом. Танк, наехавший на мину, обычно остаётся на месте с разбитой ходовой, но продолжает стрелять.</p>
       <p>Дым полностью перекрывает обзор, пока не рассеется. БТР-80, БМП-2 и БТР-70 везут по одному отделению. Десант внутри защищён от пуль и осколков, но при гибели машины выживает не весь.</p>
       <p>Отряд под плотным огнём прижимается: хуже стреляет, медленно двигается и не может брать точки. Выстрелы к РПГ и ПТУР ограничены, пополнить их можно в своей зоне расстановки или рядом с грузовиком снабжения.</p>
       <p>Соединение идёт напрямую между браузерами. Если друг не может подключиться, чаще всего мешает строгий NAT у провайдера или корпоративная сеть: попробуйте другую сеть, например мобильный интернет.</p>
@@ -364,10 +369,28 @@ const AB2 = {
 };
 const FLARE = { name:'Осветительная ракета', cost:5, cd:20, r:260, life:30 };
 const ENG = {
-  barr:{ name:'Баррикада', cost:5, limit:12, desc:'Завал из бетона и машин на одну клетку. Техника не проедет, пехота пролезет медленно и получит укрытие. Разрушается фугасами, разбирается сапёрами.' },
-  mine:{ name:'ПТ-мина ТМ-62', cost:10, limit:8, desc:'Противник её не видит. Срабатывает под вражеской техникой: лёгкую уничтожает, танку разбивает ходовую. Пехота на ней не подрывается.' }
+  barr:{ name:'Баррикада', cost:5, lim:{ fed:10, chr:16 }, desc:'Завал из бетона и машин на одну клетку. Техника не проедет, пехота пролезет медленно и получит укрытие. Разрушается фугасами, разбирается сапёрами.' },
+  mine:{ name:'ПТ-мина ТМ-62', cost:10, lim:{ fed:6, chr:16 }, desc:'Противник её не видит. Срабатывает под вражеской техникой: лёгкую уничтожает, танку разбивает ходовую. Пехота на ней не подрывается.' }
 };
 const ENG_OK = new Set([0, 1, 5, 6, 8, 9]);
+const rectDist = (r, x, y) => Math.hypot(Math.max(r.x - x, 0, x - (r.x + r.w)), Math.max(r.y - y, 0, y - (r.y + r.h)));
+const zoneDist = (g, side, x, y) => Math.min(...g.sc.deploy[side].map(r => rectDist(r, x, y)));
+// инженерные средства ставит только обороняющийся, в любом месте не ближе 200 м к зоне противника
+function engOk(g, side, x, y){
+  if (side !== g.sc.defender) return false;
+  const m = g.map; if (x < 0 || y < 0 || x >= m.W*CELL || y >= m.H*CELL) return false;
+  const i = cellIdx(m, x, y); if (!ENG_OK.has(m.t[i]) || m.obst[i]) return false;
+  return zoneDist(g, other(side), x, y) >= 200;
+}
+// чеченская пехота может выходить из подвалов жилых домов
+function infilOk(g, side, type, x, y){
+  const d = UT[type]; if (side !== 'chr' || !d || d.cls !== 'inf') return false;
+  const m = g.map; if (x < 0 || y < 0 || x >= m.W*CELL || y >= m.H*CELL) return false;
+  const i = cellIdx(m, x, y); if (!m.res[i] || (m.t[i] !== T.BLD && m.t[i] !== T.RUBBLE)) return false;
+  if (g.phase === 'deploy') return zoneDist(g, 'fed', x, y) >= 250;
+  if (zoneDist(g, 'fed', x, y) < 120) return false;
+  return !g.units.some(u => !u.dead && u.side === 'fed' && Math.hypot(u.x - x, u.y - y) < 220);
+}
 const GAME_SPEED = 1.6; // сжатие времени при движении
 const ARRIVE = 9;
 const CIV_PEN = 3; // штраф очков за гибель мирного жителя // секунд до прибытия подкрепления
@@ -379,9 +402,9 @@ const SCEN = {
     history:'В последний день 1994 года федеральные войска вошли в Грозный с нескольких направлений. Колонны группировки «Север», в их числе 131-я майкопская бригада и 81-й мотострелковый полк, двинулись к вокзалу и президентскому дворцу почти без пехотного прикрытия и с плохой связью. В городе их встретили небольшие мобильные группы с гранатомётами, стрелявшие с верхних этажей и из подвалов. Бригада понесла тяжелейшие потери у вокзала, а дворец федеральные силы заняли только 19 января 1995 года.',
     goals:{ fed:'Возьмите пехотой вокзал, дворец, Совмин и площадь Минутка. Техника без пехоты в городе слепа и уязвима.',
             chr:'Удержите ключевые здания. Бейте по бортам и крышам машин с верхних этажей и меняйте позиции после выстрела.' },
-    start:{ fed:{points:600, income:1.2}, chr:{points:450, income:.9} },
+    start:{ fed:{points:600, income:1.2}, chr:{points:520, income:1.0} },
     decks:{ fed:['f_msv','f_sap','f_vdv','f_rec','f_snp','f_btr','f_bmp','f_t72','f_t80','f_zsu','f_ural'],
-            chr:['c_opl','c_rpg','c_vet','c_sap','c_snp','c_pk','c_t72','c_btr','c_zu','c_sup'] },
+            chr:['c_opl','c_rpg','c_vet','c_snp','c_pk','c_t72','c_btr','c_zu','c_sup'] },
     deploy:{ fed:[{x:0,y:0,w:2400,h:170},{x:0,y:170,w:120,h:900}], chr:[{x:420,y:360,w:1700,h:1200}] },
     entry:{ fed:[{x:500,y:30},{x:1200,y:30},{x:1900,y:30},{x:30,y:700}], chr:[{x:1200,y:1570},{x:2370,y:1000}] },
     face:{ fed:Math.PI/2, chr:-Math.PI/2 },
@@ -426,7 +449,7 @@ const SCEN = {
 /* ================= КАРТЫ ================= */
 function buildMap(kind, seed){
   const m = kind === 'city' ? buildGrozny(seed) : buildMountain(seed);
-  m.bhp = new Float32Array(m.W*m.H); m.bst = new Uint8Array(m.W*m.H);
+  m.bhp = new Float32Array(m.W*m.H); m.bst = new Uint8Array(m.W*m.H); m.obst = new Uint8Array(m.W*m.H);
   for (let i = 0; i < m.W*m.H; i++) if (m.t[i] === T.BLD) m.bhp[i] = m.res[i] ? 100 : 260;
   return m;
 }
@@ -525,16 +548,16 @@ function buildMountain(seed){
 
 const cellIdx = (map, x, y) => clamp(Math.floor(y/CELL), 0, map.H-1)*map.W + clamp(Math.floor(x/CELL), 0, map.W-1);
 const terrAt = (map, x, y) => map.t[cellIdx(map, x, y)];
-const passableAt = (map, mc, x, y) => x >= 0 && y >= 0 && x < map.W*CELL && y < map.H*CELL && isFinite(MOVE[mc][terrAt(map, x, y)]);
+const passableAt = (map, mc, x, y) => x >= 0 && y >= 0 && x < map.W*CELL && y < map.H*CELL && isFinite(MOVE[mc][terrAt(map, x, y)]) && !(mc !== 'foot' && map.obst && map.obst[cellIdx(map, x, y)]);
 const cellCenter = (map, i) => ({ x:(i % map.W + .5)*CELL, y:(Math.floor(i/map.W) + .5)*CELL });
 
 function nearestPassable(map, mc, ci){
-  const C = MOVE[mc], W = map.W, H = map.H, cx = ci % W, cy = Math.floor(ci/W);
-  if (isFinite(C[map.t[ci]])) return ci;
+  const C = MOVE[mc], W = map.W, H = map.H, cx = ci % W, cy = Math.floor(ci/W), ob = mc !== 'foot' && map.obst;
+  if (isFinite(C[map.t[ci]]) && !(ob && ob[ci])) return ci;
   for (let r = 1; r < 14; r++) for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++){
     if (Math.abs(dx) !== r && Math.abs(dy) !== r) continue;
     const x = cx+dx, y = cy+dy; if (x < 0 || y < 0 || x >= W || y >= H) continue;
-    if (isFinite(C[map.t[y*W+x]])) return y*W+x;
+    if (isFinite(C[map.t[y*W+x]]) && !(ob && ob[y*W+x])) return y*W+x;
   }
   return -1;
 }
@@ -544,9 +567,10 @@ const DX = [1,-1,0,0,1,1,-1,-1], DY = [0,0,1,-1,1,-1,1,-1];
 function hpush(h, n){ h.push(n); let i = h.length-1; while (i > 0){ const p = (i-1) >> 1; if (h[p][0] <= h[i][0]) break; [h[p], h[i]] = [h[i], h[p]]; i = p; } }
 function hpop(h){ const top = h[0], last = h.pop(); if (h.length){ h[0] = last; let i = 0; for (;;){ const l = 2*i+1, r = l+1; let m = i; if (l < h.length && h[l][0] < h[m][0]) m = l; if (r < h.length && h[r][0] < h[m][0]) m = r; if (m === i) break; [h[m], h[i]] = [h[i], h[m]]; i = m; } } return top; }
 function findPath(map, mc, sx, sy, tx, ty){
-  const W = map.W, H = map.H, N = W*H, C = MOVE[mc], tt = map.t;
+  const W = map.W, H = map.H, N = W*H, C = MOVE[mc], tt = map.t, ob = mc !== 'foot' ? map.obst : null;
   let s = cellIdx(map, sx, sy), e = cellIdx(map, tx, ty);
   if (!isFinite(C[tt[s]])){ s = nearestPassable(map, mc, s); if (s < 0) return null; }
+  if (ob && ob[cellIdx(map, tx, ty)]){ const e2 = nearestPassable(map, mc, cellIdx(map, tx, ty)); if (e2 < 0) return null; const c2 = cellCenter(map, e2); tx = c2.x; ty = c2.y; }
   const eOk = isFinite(C[tt[e]]) && tx >= 0 && ty >= 0 && tx < W*CELL && ty < H*CELL;
   if (!isFinite(C[tt[e]])){ e = nearestPassable(map, mc, e); if (e < 0) return null; }
   if (s === e) return [eOk ? { x:tx, y:ty } : cellCenter(map, e)];
@@ -559,7 +583,7 @@ function findPath(map, mc, sx, sy, tx, ty){
     const x = i % W, y = Math.floor(i/W);
     for (let k = 0; k < 8; k++){
       const nx = x+DX[k], ny = y+DY[k]; if (nx < 0 || ny < 0 || nx >= W || ny >= H) continue;
-      const j = ny*W+nx; if (closed[j]) continue; const cj = C[tt[j]]; if (!isFinite(cj)) continue;
+      const j = ny*W+nx; if (closed[j]) continue; const cj = C[tt[j]]; if (!isFinite(cj) || (ob && ob[j])) continue;
       if (k >= 4 && (!isFinite(C[tt[y*W+nx]]) || !isFinite(C[tt[ny*W+x]]))) continue;
       const ng = gs[i] + (cj + C[tt[i]])*.5*(k >= 4 ? 1.414 : 1);
       if (ng < gs[j]){ gs[j] = ng; from[j] = i; hpush(heap, [ng + hh(j), j]); }
@@ -671,7 +695,7 @@ function applyCommand(g, side, c){
       if (g.phase !== 'deploy') return; const d = UT[c.type];
       if (!d || d.side !== side || !deckOf(g, side).includes(c.type)) return;
       if (S.pts < d.cost || (S.used[c.type] || 0) >= d.limit) return;
-      if (!inRects(g.sc.deploy[side], c.x, c.y) || !passableAt(g.map, d.mc, c.x, c.y)) return;
+      if (!((inRects(g.sc.deploy[side], c.x, c.y) || infilOk(g, side, c.type, c.x, c.y)) && passableAt(g.map, d.mc, c.x, c.y))) return;
       S.pts -= d.cost; S.used[c.type] = (S.used[c.type] || 0) + 1; spawnUnit(g, c.type, side, c.x, c.y); return;
     }
     case 'undeploy': {
@@ -681,8 +705,8 @@ function applyCommand(g, side, c){
     }
     case 'eng': {
       if (g.phase !== 'deploy') return; const E = ENG[c.k]; if (!E) return;
-      if (S.pts < E.cost || (S.eng[c.k] || 0) >= E.limit || !inRects(g.sc.deploy[side], c.x, c.y)) return;
-      const m = g.map, i = cellIdx(m, c.x, c.y); if (!ENG_OK.has(m.t[i])) return;
+      if (S.pts < E.cost || (S.eng[c.k] || 0) >= E.lim[side] || !engOk(g, side, c.x, c.y)) return;
+      const m = g.map, i = cellIdx(m, c.x, c.y);
       if (c.k === 'barr'){
         if (g.units.some(u => cellIdx(m, u.x, u.y) === i)) return;
         m.bprev = m.bprev || new Int8Array(m.W*m.H).fill(-1); m.bown = m.bown || new Uint8Array(m.W*m.H);
@@ -743,7 +767,7 @@ function applyCommand(g, side, c){
     }
     case 'redeploy': {
       if (g.phase !== 'deploy') return; const u = ownUnits(g, side, [c.id])[0]; if (!u) return;
-      if (!inRects(g.sc.deploy[side], c.x, c.y) || !passableAt(g.map, UT[u.type].mc, c.x, c.y)) return;
+      if (!((inRects(g.sc.deploy[side], c.x, c.y) || infilOk(g, side, u.type, c.x, c.y)) && passableAt(g.map, UT[u.type].mc, c.x, c.y))) return;
       u.x = c.x; u.y = c.y; if (u.cargo){ const cu = g.byId.get(u.cargo); if (cu){ cu.x = u.x; cu.y = u.y; } } return;
     }
     case 'ready': S.ready = !!c.v; return;
@@ -751,9 +775,19 @@ function applyCommand(g, side, c){
       if (g.phase !== 'battle') return; const d = UT[c.type];
       if (!d || d.side !== side || !deckOf(g, side).includes(c.type)) return;
       if (S.pts < d.cost || (S.used[c.type] || 0) >= d.limit) return;
+      if (c.x !== undefined){
+        if (!infilOk(g, side, c.type, c.x, c.y)){ g.ev.push({ e:'buyfail', side, x:Math.round(c.x), y:Math.round(c.y) }); return; }
+        const p = cellCenter(g.map, cellIdx(g.map, c.x, c.y));
+        S.pts -= d.cost; S.used[c.type] = (S.used[c.type] || 0) + 1; g.arrivals.push({ type:c.type, side, at:g.t + ARRIVE + 3, x:p.x, y:p.y }); return;
+      }
       S.pts -= d.cost; S.used[c.type] = (S.used[c.type] || 0) + 1; g.arrivals.push({ type:c.type, side, at:g.t + ARRIVE }); return;
     }
-    case 'move': { if (g.phase !== 'battle') return; const us = ownUnits(g, side, c.ids); if (us.length) formationMove(g, us, c.x, c.y, !!c.fast); for (const u of us) u.focus = 0; return; }
+    case 'afire': {
+      if (g.phase !== 'battle') return;
+      for (const u of ownUnits(g, side, c.ids)){ if (!UT[u.type].weapons.some(w => w.k !== 'at')) continue; u.afire = { x:c.x, y:c.y, until:g.t + 40 }; u.focus = 0; }
+      return;
+    }
+    case 'move': { if (g.phase !== 'battle') return; const us = ownUnits(g, side, c.ids); if (us.length) formationMove(g, us, c.x, c.y, !!c.fast); for (const u of us){ u.focus = 0; u.afire = null; } return; }
     case 'attack': {
       if (g.phase !== 'battle') return; const tg = g.byId.get(c.target); if (!tg || tg.side === side || tg.dead) return;
       for (const u of ownUnits(g, side, c.ids)){
@@ -762,7 +796,7 @@ function applyCommand(g, side, c){
       }
       return;
     }
-    case 'stop': for (const u of ownUnits(g, side, c.ids)){ u.path = null; u.dest = null; u.focus = 0; u.fast = false; u.board = 0; } return;
+    case 'stop': for (const u of ownUnits(g, side, c.ids)){ u.path = null; u.dest = null; u.focus = 0; u.fast = false; u.board = 0; u.afire = null; } return;
     case 'ability': {
       if (g.phase !== 'battle') return; const A = AB[side];
       if (S.cd > 0 || S.pts < A.cost) return;
@@ -858,7 +892,7 @@ function damage(g, b, dmg){
   }
   if (b.hp <= 0){
     b.dead = true; const d = UT[b.type], S = g.sides[b.side], E = g.sides[other(b.side)];
-    S.lostVal += d.cost; if (d.cls === 'veh') S.lostVeh++; else S.lostMen += d.men;
+    S.lostVal += d.cost; if (d.cls === 'veh'){ S.lostVeh++; g.map.obst[cellIdx(g.map, b.x, b.y)] = 1; } else S.lostMen += d.men;
     E.score += d.killVal !== undefined ? d.killVal : d.cost*.5;
     g.ev.push({ e:'kill', id:b.id, x:Math.round(b.x), y:Math.round(b.y), h:Math.round(b.h*100), ta:Math.round((b.ta || 0)*100), v:d.cls === 'veh' ? 1 : 0, side:b.side, type:b.type });
   } else if (UT[b.type].cls === 'inf'){
@@ -924,7 +958,7 @@ function fireAt(g, u, w, ws, b){
   p *= 1 - .6*Math.min(u.supp, 100)/100;
   if (db.cls === 'inf'){
     const tb = terrAt(g.map, b.x, b.y);
-    let c = 1; if (tb === T.BLD) c = w.he ? .7 : .35; else if (tb === T.RUBBLE) c = w.he ? .65 : .5; else if (tb === T.FOREST) c = .6; else if (tb === T.ROCK) c = .5;
+    let c = 1; if (g.map.obst[cellIdx(g.map, b.x, b.y)]) c = .6; if (tb === T.BLD) c = w.he ? .7 : .35; else if (tb === T.RUBBLE) c = w.he ? .65 : .5; else if (tb === T.FOREST) c = .6; else if (tb === T.ROCK) c = .5;
     p *= c;
     if (w.lowElev && b.inB && d < 70) p *= .3; // пушка танка не задирается на верхние этажи
   } else if (w.k === 'small' || w.k === 'mg') p *= 1.3;
@@ -942,7 +976,7 @@ function fireAt(g, u, w, ws, b){
   } else {
     const ang = Math.atan2(u.y-b.y, u.x-b.x), rel = Math.abs(angDiff(ang, b.h));
     let face = rel < Math.PI/4 ? 'f' : rel > Math.PI*.75 ? 'r' : 's';
-    if (w.k === 'at' && u.inB && d < 150 && Math.random() < .5) face = 't';
+    if (w.k === 'at' && u.inB && d < 150 && Math.random() < .6) face = 't';
     const arm = db.armor[face], pen = w.pen*(.85 + Math.random()*.3);
     if (pen > arm){
       let dmg = w.dv*(.7 + Math.random()*.6);
@@ -956,6 +990,48 @@ function fireAt(g, u, w, ws, b){
   }
 }
 
+function areaFire(g, u, d, w, ws){
+  const A = u.afire; if (g.t > A.until){ u.afire = null; return false; }
+  const dd = Math.hypot(A.x - u.x, A.y - u.y); if (dd > w.r || dd < (w.min || 0)) return false;
+  if (!los(g.map, u.x, u.y, A.x, A.y)) return false;
+  if (d.cls === 'veh'){ u.aim = Math.atan2(A.y - u.y, A.x - u.x); u.aimT = g.t; if (Math.abs(angDiff(u.aim, u.ta)) > .18){ ws.cd = .1; return true; } }
+  const ix = A.x + gauss()*10, iy = A.y + gauss()*10, inB = terrAt(g.map, A.x, A.y) === T.BLD;
+  u.fired = g.t; if (isFinite(ws.ammo)) ws.ammo--;
+  g.ev.push({ e:'s', a:[Math.round(u.x), Math.round(u.y), Math.round(ix), Math.round(iy)], k:w.k, sid:u.id, tid:0 });
+  g.noise.push({ x:ix, y:iy, t:g.t });
+  if (w.he){
+    const eff = w.lowElev && dd < 70 && inB ? .35 : 1;
+    splash(g, ix, iy, (w.splash || 6)*1.2, w.di*.6*eff, 5, -1, u.side);
+    if (w.bd) damageBuilding(g, ix, iy, w.bd*eff, 0, u.side);
+  } else {
+    for (const t of g.units){
+      if (t.dead || t.carrier || t.side === u.side) continue; const r = Math.hypot(t.x - ix, t.y - iy); if (r > 30) continue;
+      t.supp = Math.min(120, t.supp + w.supp*.5*(t.inB ? .6 : 1)); t.hitT = g.t;
+      if (UT[t.type].cls === 'inf' && r < 14 && Math.random() < .15) damage(g, t, w.di*.5*(t.inB ? .5 : 1));
+    }
+  }
+  ws.cd = w.rof*(.9 + Math.random()*.3);
+  return true;
+}
+function separateVehicles(g, dt){
+  const vs = g.units.filter(u => !u.dead && !u.carrier && UT[u.type].cls === 'veh'), m = g.map, R = 10;
+  for (let i = 0; i < vs.length; i++) for (let j = i + 1; j < vs.length; j++){
+    const a = vs[i], b = vs[j], dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy);
+    if (d >= R) continue;
+    const nx = d > .01 ? dx/d : Math.cos(a.id), ny = d > .01 ? dy/d : Math.sin(a.id), push = Math.min((R - d)*.5, 12*dt + (R - d)*.2);
+    const ka = a.moving || !b.moving ? 1 : .3, kb = b.moving || !a.moving ? 1 : .3;
+    const ax = a.x - nx*push*ka, ay = a.y - ny*push*ka, bx = b.x + nx*push*kb, by = b.y + ny*push*kb;
+    if (passableAt(m, UT[a.type].mc, ax, ay)){ a.x = ax; a.y = ay; }
+    if (passableAt(m, UT[b.type].mc, bx, by)){ b.x = bx; b.y = by; }
+  }
+  // не въезжать в остовы: если впереди на пути появился остов — перестроить маршрут
+  for (const u of vs){
+    if (!u.path || !u.path.length || u.immob) continue;
+    const p = u.path[0], k = Math.min(1, 12/Math.max(1, Math.hypot(p.x - u.x, p.y - u.y)));
+    const ci = cellIdx(m, u.x + (p.x - u.x)*k, u.y + (p.y - u.y)*k);
+    if (m.obst[ci] && ci !== cellIdx(m, u.x, u.y) && u.dest){ const np = findPath(m, UT[u.type].mc, u.x, u.y, u.dest.x, u.dest.y); u.path = np; if (!np) u.dest = null; }
+  }
+}
 function updateUnit(g, u, dt){
   const d = UT[u.type];
   u.supp = Math.max(0, u.supp - (g.t - u.hitT > 3 ? 14 : 5)*dt);
@@ -998,7 +1074,7 @@ function updateUnit(g, u, dt){
     const w = d.weapons[i], ws = u.w[i]; ws.cd -= dt;
     if (ws.cd > 0 || ws.ammo <= 0) continue;
     const tg = pickTarget(g, u, w, ws);
-    if (!tg){ ws.cd = .3; continue; }
+    if (!tg){ if (!(u.afire && w.k !== 'at' && areaFire(g, u, d, w, ws))) ws.cd = .3; continue; }
     if (d.cls === 'veh'){ // башня должна довернуться на цель
       u.aim = Math.atan2(tg.y - u.y, tg.x - u.x); u.aimT = g.t;
       if (Math.abs(angDiff(u.aim, u.ta)) > .18){ ws.cd = .1; continue; }
@@ -1034,14 +1110,15 @@ function step(g, dt){
   g.smokes = g.smokes.filter(s => s.until > g.t); g.flares = g.flares.filter(f => f.until > g.t);
   // подкрепления
   for (const a of g.arrivals.filter(a => a.at <= g.t)){
-    const pts = g.entry[a.side], e = pts[Math.floor(Math.random()*pts.length)], d = UT[a.type];
-    const ci = nearestPassable(g.map, d.mc, cellIdx(g.map, e.x + gauss()*30, e.y + gauss()*30));
-    if (ci >= 0){ const p = cellCenter(g.map, ci); const nu = spawnUnit(g, a.type, a.side, p.x, p.y); g.ev.push({ e:'arr', side:a.side, type:a.type, id:nu.id, x:Math.round(p.x), y:Math.round(p.y) }); }
+    const pts = g.entry[a.side], e = a.x !== undefined ? { x:a.x, y:a.y } : pts[Math.floor(Math.random()*pts.length)], d = UT[a.type], sp = a.x !== undefined ? 0 : 30;
+    const ci = nearestPassable(g.map, d.mc, cellIdx(g.map, e.x + gauss()*sp, e.y + gauss()*sp));
+    if (ci >= 0){ const p = cellCenter(g.map, ci); const nu = spawnUnit(g, a.type, a.side, p.x, p.y); g.ev.push({ e:'arr', side:a.side, type:a.type, id:nu.id, x:Math.round(p.x), y:Math.round(p.y), inf:a.x !== undefined ? 1 : 0 }); }
   }
   g.arrivals = g.arrivals.filter(a => a.at > g.t);
   g.visT -= dt; if (g.visT <= 0){ updateVis(g); g.visT = .25; }
   updateCivs(g, dt);
   for (const u of g.units) if (!u.dead && !u.carrier) updateUnit(g, u, dt);
+  separateVehicles(g, dt);
   for (const u of g.units) if (u.carrier){ const v = g.byId.get(u.carrier); if (v && !v.dead){ u.x = v.x; u.y = v.y; u.supp = 0; } else u.carrier = 0; }
   // мины
   for (let k = g.mines.length - 1; k >= 0; k--){
@@ -1255,15 +1332,21 @@ function aiStep(g, side, dt, st){
       const zones = g.sc.deploy[side];
       for (const o of g.objs) for (let k = 0; k < 5; k++){
         const a = Math.random()*7, r = o.r + 30 + Math.random()*90, x = o.x + Math.cos(a)*r, y = o.y + Math.sin(a)*r;
-        if (!inRects(zones, x, y)) continue; const t = terrAt(g.map, x, y);
-        if (t === T.ROAD) applyCommand(g, side, { c:k % 2 ? 'eng' : 'eng', k:k % 2 ? 'mine' : 'barr', x, y });
+        const t = terrAt(g.map, x, y);
+        if (t === T.ROAD) applyCommand(g, side, { c:'eng', k:k % 2 ? 'mine' : 'barr', x, y });
       }
     }
     applyCommand(g, side, { c:'ready', v:true }); return;
   }
   if (g.phase !== 'battle' || st.t < (st.next || 0)) return;
   st.next = st.t + 2.5;
-  if (S.pts > 70 && Math.random() < .6){ const o = affordable(); if (o.length) applyCommand(g, side, { c:'buy', type:pick(o) }); }
+  if (S.pts > 70 && Math.random() < .6){ const o = affordable(); if (o.length){
+    const k = pick(o);
+    if (side === 'chr' && UT[k].cls === 'inf' && Math.random() < .6){
+      const ob = g.objs[Math.floor(Math.random()*g.objs.length)];
+      for (let tr = 0; tr < 12; tr++){ const x = ob.x + gauss()*350, y = ob.y + gauss()*350; if (infilOk(g, side, k, x, y)){ applyCommand(g, side, { c:'buy', type:k, x, y }); break; } }
+    } else applyCommand(g, side, { c:'buy', type:k });
+  } }
   if (S.cd <= 0 && S.pts > AB[side].cost + 25){
     const en = g.units.filter(u => u.side !== side && u.vis[side]);
     let best = null, bn = 1;
@@ -1308,7 +1391,7 @@ function encodeSnap(g, ev){
     o:g.objs.map(o => [Math.round(o.prog), o.owner || 0]),
     u:g.units.map(u => [u.id, TI[u.type], u.side === 'fed' ? 0 : 1, Math.round(u.x), Math.round(u.y), Math.round(u.h*100), Math.round(u.hp), Math.round(u.supp),
       (u.vis.fed?1:0)|(u.vis.chr?2:0)|(u.inB?4:0)|(u.moving?8:0)|(u.fast?16:0)|((g.t-u.fired < .4)?32:0)|(u.focus?64:0),
-      u.dest ? Math.round(u.dest.x) : -1, u.dest ? Math.round(u.dest.y) : -1, u.w.map(w => isFinite(w.ammo) ? w.ammo : -1), Math.round(u.ta*100), u.carrier, u.smk, (u.immob?1:0)|(u.workT?2:0)|(u.board?4:0)|(u.workT && u.workT.k === 'mine'?8:0)]),
+      u.dest ? Math.round(u.dest.x) : -1, u.dest ? Math.round(u.dest.y) : -1, u.w.map(w => isFinite(w.ammo) ? w.ammo : -1), Math.round(u.ta*100), u.carrier, u.smk, (u.immob?1:0)|(u.workT?2:0)|(u.board?4:0)|(u.workT && u.workT.k === 'mine'?8:0), u.afire ? Math.round(u.afire.x) : -1, u.afire ? Math.round(u.afire.y) : -1]),
     mn:g.mines.map(m => [m.id, Math.round(m.x), Math.round(m.y), m.side === 'fed' ? 0 : 1, (m.rev.fed?1:0)|(m.rev.chr?2:0)]),
     sm:g.smokes.map(s => [Math.round(s.x), Math.round(s.y), Math.round(smokeR(g, s)), Math.round(s.until - g.t)]),
     fl:g.flares.map(f => [Math.round(f.x), Math.round(f.y), Math.round((f.until - g.t)*10)/10]),
@@ -1324,10 +1407,10 @@ function decodeSnap(s){
     civs:s.cv.map(a => ({ x:a[0], y:a[1], st:a[2], h:a[3]/10, mv:!!a[4], id:a[5] })),
     units:s.u.map(a => ({ id:a[0], type:TK[a[1]], side:a[2] ? 'chr' : 'fed', x:a[3], y:a[4], h:a[5]/100, hp:a[6], supp:a[7],
       vis:{ fed:!!(a[8]&1), chr:!!(a[8]&2) }, inB:!!(a[8]&4), moving:!!(a[8]&8), fast:!!(a[8]&16), fired:!!(a[8]&32), focus:!!(a[8]&64),
-      dest:a[9] >= 0 ? { x:a[9], y:a[10] } : null, ammo:a[11], ta:a[12]/100, carrier:a[13], smk:a[14], immob:!!(a[15]&1), working:(a[15]&2) ? ((a[15]&8) ? 'mine' : 'barr') : null, boarding:!!(a[15]&4) })) };
+      dest:a[9] >= 0 ? { x:a[9], y:a[10] } : null, ammo:a[11], ta:a[12]/100, carrier:a[13], smk:a[14], immob:!!(a[15]&1), working:(a[15]&2) ? ((a[15]&8) ? 'mine' : 'barr') : null, boarding:!!(a[15]&4), afire:a[16] >= 0 ? { x:a[16], y:a[17] } : null })) };
 }
 
-if (typeof module !== 'undefined') module.exports = { UT, SCEN, AB, AB2, ENG, T, CELL, TK, spawnUnit, makeGame, step, applyCommand, aiStep, encodeSnap, decodeSnap, findPath, buildMap, los };
+if (typeof module !== 'undefined') module.exports = { UT, SCEN, AB, AB2, ENG, T, CELL, TK, spawnUnit, infilOk, engOk, makeGame, step, applyCommand, aiStep, encodeSnap, decodeSnap, findPath, buildMap, los };
 
 </script>
 <script>
@@ -1436,16 +1519,34 @@ const truckBody = tent => [ ...wheels([-6, -3, 5], 3.3, 1.8), [-8, 8, -2.2, 2.2,
   [4, 8, -3, 3, 1.6, 4, 'hull'], [7.2, 8, -2.6, 2.6, 2.8, 3.6, 'glass'], [4, 7.4, -2.8, 2.8, 4, 4.5, 'light'],
   [-8, 3.6, -3.2, 3.2, 1.6, 2.5, 'hull'], ...(tent ? [[-8, 3.4, -3.1, 3.1, 2.5, 4.3, 'tent'], [-8, 3.4, -.4, .4, 4.3, 4.5, 'dark']] : [[-8, 3.6, -3.2, -2.6, 2.5, 3.2, 'dark'], [-8, 3.6, 2.6, 3.2, 2.5, 3.2, 'dark']]) ];
 const MODEL_DEF = {
-  tank:{ hull:[ ...tracks(9, 4.5, 1.5, 2), [-8, 8, -3, 3, 0, 2, 'dark'], [-9, 9, -4.5, 4.5, 2, 3, 'hull'], [5, 9, -4, 4, 2, 3, 'light'],
-      [-9, -5, -3, 3, 3, 3.8, 'dark'], [-8.6, -6.2, -4.4, -3, 3, 4, 'metal'], [-8.6, -6.2, 3, 4.4, 3, 4, 'metal'] ],
-    tx:-.5, tz:3, barrel:14, turret:[ [-5, -3.5, -2.5, 2.5, .4, 1.8, 'dark'], [-3.8, 3.4, -3.3, 3.3, 0, 2, 'hull'], [-3, 2.4, -2.5, 2.5, 2, 2.8, 'light'],
-      [-.8, .8, -2.6, 2.6, 2, 2.8, 'stripe'], [-2.2, -.2, .6, 2.3, 2.8, 3.7, 'dark'], [-1.6, 0, -2.2, -.8, 2.8, 3.3, 'dark'],
-      [3.4, 14, -.45, .45, 1, 1.8, 'metal'], [11.2, 12.4, -.65, .65, 1, 1.8, 'dark'] ] },
-  tank80:{ hull:[ ...tracks(9.5, 4.5, 1.5, 2), [-8.5, 8.5, -3, 3, 0, 2, 'dark'], [-9.5, 9.5, -4.5, 4.5, 2, 3, 'hull'], [5, 9.5, -4, 4, 2, 3, 'light'],
-      [5.5, 9, -4, -.3, 3, 3.6, 'era'], [5.5, 9, .3, 4, 3, 3.6, 'era'], [-9.5, -5, -3.4, 3.4, 3, 3.6, 'dark'] ],
-    tx:-.5, tz:3, barrel:14, turret:[ [-5, -3.5, -2.5, 2.5, .4, 1.8, 'dark'], [-3.8, 3.4, -3.3, 3.3, 0, 2, 'hull'], [1.6, 3.9, -3.2, -.4, .2, 2.4, 'era'], [1.6, 3.9, .4, 3.2, .2, 2.4, 'era'],
-      [-3, 1.6, -2.6, 2.6, 2, 2.8, 'light'], [-.8, .8, -2.6, 2.6, 2, 2.8, 'stripe'], [-2.2, -.2, .6, 2.3, 2.8, 3.7, 'dark'],
-      [3.9, 14, -.45, .45, 1, 1.8, 'metal'] ] },
+  // Т-72А: низкий корпус, литая башня-«купол» ближе к центру, длинный вынос пушки, бочки на корме, резиновые экраны
+  tank:{ hull:[ ...tracks(9, 4.5, 1.3, 1.8), [-8.6, 8.6, -3.2, 3.2, 0, 2, 'dark'],
+      [-9, 9, -4.5, 4.5, 1.8, 2.6, 'hull'], [-1, 9, -4.65, -4.25, 1.1, 2.6, 'dark'], [-1, 9, 4.25, 4.65, 1.1, 2.6, 'dark'],
+      [5.2, 9, -3.6, 3.6, 1.8, 2.6, 'light'], [6.2, 6.8, -3.2, 3.2, 2.6, 3.1, 'dark'],
+      [8.3, 9, -3.5, -2.8, 2.6, 3, 'glass'], [8.3, 9, 2.8, 3.5, 2.6, 3, 'glass'],
+      [-9, -3.2, -3.1, 3.1, 2.6, 3.1, 'dark'], [-8.4, -4, -2.3, -1.7, 3.1, 3.3, 'metal'], [-8.4, -4, 1.7, 2.3, 3.1, 3.3, 'metal'],
+      [-9.6, -8.3, -3.3, -.3, 2.4, 3.6, 'metal', 'e'], [-9.6, -8.3, .3, 3.3, 2.4, 3.6, 'metal', 'e'],
+      [-3, 5, -4.4, -3.4, 2.6, 3, 'metal'] ],
+    tx:.8, tz:2.6, barrel:15.2, turret:[ [-4.2, -3, -2.2, 2.2, .3, 1.4, 'dark'],
+      [-3.1, 3.1, -2.85, 2.85, 0, 1, 'hull', 'e'], [-2.9, 2.9, -2.6, 2.6, 1, 1.8, 'hull', 'e'], [-2.4, 2.4, -2.1, 2.1, 1.8, 2.4, 'light', 'e'],
+      [-.45, .45, -2.6, 2.6, 1.6, 2.4, 'stripe'],
+      [-1.9, -.1, .3, 2.1, 2.4, 3.1, 'dark', 'e'], [-1.4, .1, -1.9, -.5, 2.4, 2.75, 'dark', 'e'], [-1, 1.6, 1.05, 1.35, 3.1, 3.4, 'metal'],
+      [2, 3.2, .9, 1.9, .9, 1.8, 'metal'],
+      [2.6, 15.2, -.38, .38, .9, 1.6, 'metal'], [8.6, 9.9, -.58, .58, .9, 1.6, 'dark'] ] },
+  // Т-80БВ: та же литая башня, но с «подковой» блоков динамической защиты и блоками на лобовом листе, корма с решёткой ГТД
+  tank80:{ hull:[ ...tracks(9.5, 4.5, 1.3, 1.8), [-9, 9, -3.2, 3.2, 0, 2, 'dark'],
+      [-9.5, 9.5, -4.5, 4.5, 1.8, 2.6, 'hull'], [-1, 9.5, -4.65, -4.25, 1.1, 2.6, 'dark'], [-1, 9.5, 4.25, 4.65, 1.1, 2.6, 'dark'],
+      [5.4, 9.5, -3.7, 3.7, 1.8, 2.6, 'light'],
+      [5.8, 7.2, -3.6, -2.4, 2.6, 3.2, 'era'], [5.8, 7.2, -2.2, -1, 2.6, 3.2, 'era'], [5.8, 7.2, 1, 2.2, 2.6, 3.2, 'era'], [5.8, 7.2, 2.4, 3.6, 2.6, 3.2, 'era'],
+      [7.4, 8.8, -3.6, -2.4, 2.6, 3.2, 'era'], [7.4, 8.8, -2.2, -1, 2.6, 3.2, 'era'], [7.4, 8.8, 1, 2.2, 2.6, 3.2, 'era'], [7.4, 8.8, 2.4, 3.6, 2.6, 3.2, 'era'],
+      [-9.5, -5.2, -3.3, 3.3, 2.6, 3, 'dark'], [-9.3, -5.6, -3, 3, 3, 3.2, 'metal'], [-4.8, -3.4, -3.3, 3.3, 2.6, 3.1, 'dark'] ],
+    tx:.8, tz:2.6, barrel:15.4, turret:[ [-4.2, -3, -2.2, 2.2, .3, 1.4, 'dark'],
+      [-3.1, 3.1, -2.85, 2.85, 0, 1, 'hull', 'e'], [-2.9, 2.9, -2.6, 2.6, 1, 1.8, 'hull', 'e'], [-2.4, 2.4, -2.1, 2.1, 1.8, 2.4, 'light', 'e'],
+      [1.9, 3.5, -2.9, -1.9, .4, 2, 'era'], [2.3, 3.7, -1.7, -.6, .4, 2, 'era'], [2.3, 3.7, .6, 1.7, .4, 2, 'era'], [1.9, 3.5, 1.9, 2.9, .4, 2, 'era'],
+      [.4, 2.2, -2.4, -1.3, 2.2, 2.6, 'era'], [.4, 2.2, 1.3, 2.4, 2.2, 2.6, 'era'],
+      [-.45, .45, -2.4, 2.4, 1.8, 2.4, 'stripe'],
+      [-1.9, -.1, .3, 2.1, 2.4, 3.1, 'dark', 'e'], [-1.4, .1, -1.9, -.5, 2.4, 2.75, 'dark', 'e'],
+      [3.7, 15.4, -.38, .38, .9, 1.6, 'metal'] ] },
   ifv:{ hull:[ ...tracks(8, 4, 1.2, 1.6), [-7.5, 7.5, -2.8, 2.8, 0, 2, 'dark'], [-8, 5, -4, 4, 1.6, 3, 'hull'], [5, 8, -3.6, 3.6, 1.2, 2.4, 'light'],
       [3.8, 5.4, -4, 4, 1.6, 2.8, 'light'], [-8, -6, -3.6, -.8, 3, 3.4, 'dark'], [-8, -6, .8, 3.6, 3, 3.4, 'dark'] ],
     tx:1, tz:3, barrel:10, turret:[ [-2.2, 2, -2, 2, 0, 1.5, 'hull'], [-1.4, 1, -1.3, 1.3, 1.5, 2.1, 'light'], [-.8, .8, -2, 2, 1.5, 1.9, 'stripe'],
@@ -1475,8 +1576,14 @@ function buildStack(boxes, pal){
       if (!(b[4] <= zc && zc < b[5])) continue; any = true;
       const top = zc + .5 >= b[5], f = (.62 + .38*zc/z1)*(top ? 1.12 : .92);
       x.fillStyle = shade(pal[b[6]], f);
-      x.fillRect((b[0] - x0)*VX, (b[2] - y0)*VX, (b[1] - b[0])*VX, (b[3] - b[2])*VX);
-      if (top){ x.strokeStyle = shade(pal[b[6]], f*.7); x.lineWidth = 1; x.strokeRect((b[0] - x0)*VX + .5, (b[2] - y0)*VX + .5, (b[1] - b[0])*VX - 1, (b[3] - b[2])*VX - 1); }
+      const rx = (b[0] - x0)*VX, ry = (b[2] - y0)*VX, rw = (b[1] - b[0])*VX, rh = (b[3] - b[2])*VX;
+      if (b[7] === 'e'){
+        x.beginPath(); x.ellipse(rx + rw/2, ry + rh/2, rw/2, rh/2, 0, 0, 7); x.fill();
+        if (top){ x.strokeStyle = shade(pal[b[6]], f*.7); x.lineWidth = 1; x.stroke(); }
+      } else {
+        x.fillRect(rx, ry, rw, rh);
+        if (top){ x.strokeStyle = shade(pal[b[6]], f*.7); x.lineWidth = 1; x.strokeRect(rx + .5, ry + .5, rw - 1, rh - 1); }
+      }
     }
     layers.push(any ? c : null);
   }
@@ -1694,6 +1801,44 @@ function sound(kind, vol){
   }
 }
 
+/* ---------- Двигатели ---------- */
+const ENG_V = [];
+function engVoice(){
+  const a = SND.ctx, o1 = a.createOscillator(), o2 = a.createOscillator(); o1.type = 'sawtooth'; o2.type = 'square';
+  const lp = a.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 240; lp.Q.value = 3;
+  const n = a.createBufferSource(); n.buffer = SND.noise; n.loop = true;
+  const nf = a.createBiquadFilter(); nf.type = 'bandpass'; nf.frequency.value = 160; nf.Q.value = .9;
+  const ng = a.createGain(); ng.gain.value = .9;
+  const cl = a.createBiquadFilter(); cl.type = 'bandpass'; cl.frequency.value = 2200; cl.Q.value = 4; const clg = a.createGain(); clg.gain.value = 0;
+  const lfo = a.createOscillator(); lfo.type = 'square'; lfo.frequency.value = 9; const lfog = a.createGain(); lfog.gain.value = 0; lfo.connect(lfog); lfog.connect(clg.gain);
+  const wh = a.createOscillator(); wh.type = 'sine'; const whg = a.createGain(); whg.gain.value = 0;
+  const g = a.createGain(); g.gain.value = 0;
+  const o2g = a.createGain(); o2g.gain.value = .35;
+  o1.connect(lp); o2.connect(o2g); o2g.connect(lp); n.connect(nf); nf.connect(ng); ng.connect(lp); lp.connect(g);
+  n.connect(cl); cl.connect(clg); clg.connect(g);
+  wh.connect(whg); whg.connect(g); g.connect(SND.master);
+  o1.start(); o2.start(); n.start(Math.random()); wh.start(); lfo.start();
+  return { o1, o2, lp, g, wh, whg, lfog, lfo, jit:Math.random()*.12 };
+}
+function updateEngines(list){
+  if (!SND.ctx) return;
+  const t = SND.ctx.currentTime;
+  if (!SND.on){ for (const v of ENG_V) v.g.gain.setTargetAtTime(0, t, .1); return; }
+  while (ENG_V.length < 4) ENG_V.push(engVoice());
+  list.sort((a, b) => b.vol - a.vol);
+  ENG_V.forEach((v, i) => {
+    const u = list[i];
+    if (!u || u.vol < .03){ v.g.gain.setTargetAtTime(0, t, .3); v.lfog.gain.setTargetAtTime(0, t, .2); return; }
+    const d = UT[u.type], turb = u.type === 'f_t80', wheel = d.mc === 'wheel', tr = d.mc === 'track';
+    const f = (wheel ? 42 : 31)*(u.moving ? 1.75 : 1)*(1 + v.jit);
+    v.o1.frequency.setTargetAtTime(f, t, .35); v.o2.frequency.setTargetAtTime(f*1.5, t, .35);
+    v.lp.frequency.setTargetAtTime(u.moving ? 460 : 230, t, .35);
+    v.whg.gain.setTargetAtTime(turb ? (u.moving ? .035 : .02) : 0, t, .3); v.wh.frequency.setTargetAtTime(turb ? (u.moving ? 1350 : 950) : 120, t, .5);
+    v.lfog.gain.setTargetAtTime(tr && u.moving ? .12 : 0, t, .2); v.lfo.frequency.setTargetAtTime(tr ? 7 + v.jit*20 : 9, t, .3);
+    v.g.gain.setTargetAtTime(u.vol*(u.moving ? .22 : .09), t, .25);
+  });
+}
+
 </script>
 <script>
 /* ================= КЛИЕНТ ================= */
@@ -1713,6 +1858,9 @@ const APP = { mode:null, side:null, g:null, sc:null, map:null, mapCv:null, view:
   pings:[], newUnits:new Map(), burning:[], viewMode:'auto', shake:0, log:[], logFilter:'all', lastArtyLog:0, bldAgg:null,
   miniBase:null, miniDirty:true, miniT:0, miniDrag:false, bodies:[], side0:null, trk:new Map(), snow:[], lastPhase:null, opts:{}, roundShown:false };
 APP.lobby.rounds = 2; APP.lobby.tod = 'day';
+const pseudoG = () => ({ sc:APP.sc, map:APP.map, phase:APP.view.phase, units:APP.view.units.filter(u => u.side === APP.side || u.vis[APP.side]) });
+const infilOkC = (type, x, y) => APP.sc && APP.view && infilOk(pseudoG(), APP.side, type, x, y);
+const engOkC = (x, y) => APP.sc && engOk(pseudoG(), APP.side, x, y);
 const roleOf = s => APP.sc && s === APP.sc.defender ? 'защита' : 'атака';
 
 /* ---------- Сеть ---------- */
@@ -1852,7 +2000,7 @@ function onSnap(s){
   if (s.ev && s.ev.length) addFx(s.ev, old);
   if (APP.view.phase === 'end') showEnd(); else if (APP.view.phase === 'inter') showRound();
 }
-function stopGame(){ clearInterval(APP.loop); APP.loop = null; APP.g = null; APP.sc = null; APP.view = null; $('#hud').hidden = true; $('#end').hidden = true; PART.length = 0; }
+function stopGame(){ try { updateEngines([]); } catch(e){} clearInterval(APP.loop); APP.loop = null; APP.g = null; APP.sc = null; APP.view = null; $('#hud').hidden = true; $('#end').hidden = true; PART.length = 0; }
 
 /* ---------- Журнал ---------- */
 function gridRef(x, y){ const p = v => String(Math.floor(v/500)*5).padStart(2, '0'); return 'кв. ' + p(x) + '-' + p(y); }
@@ -1902,6 +2050,11 @@ function addFx(evs, oldById){
         const seen = (su && (su.side === me || su.vis[me])) || (tu && tu.side === me);
         const [x1, y1, x2, y2] = e.a;
         if (!seen){ if (e.k === 'cannon' || e.k === 'at') sound(e.k === 'at' ? 'rocket' : 'cannon', camVol(x1, y1)*.5); break; }
+        if (su && su.side !== me && !su.vis[me]){
+          // стрелка не видно, но видна вспышка и трасса
+          APP.fx.push({ k:'flashmark', x:x1, y:y1, t0:now, d:2500 });
+          if (now - (APP.lastHidden || 0) > 7000 && tu && tu.side === me){ APP.lastHidden = now; addLog('По нам бьют из невидимой точки' + (terrAt(map, x1, y1) === T.BLD ? ' в здании' : '') + ', ' + gridRef(x1, y1) + '. Можно обстрелять её: T.', 'bad', { x:x1, y:y1 }); }
+        }
         let sx = x1, sy = y1; const ang = Math.atan2(y2 - y1, x2 - x1);
         if (su && UT[su.type].cls === 'veh' && MODEL_OF[su.type]){ const tip = barrelTip(MODEL_OF[su.type], su.x, su.y, su.h, su.ta, voxW()); sx = tip.x; sy = tip.y; }
         const kind = e.k === 'at' ? 'rocket' : e.k === 'cannon' ? 'shell' : 'tracer';
@@ -1948,6 +2101,7 @@ function addFx(evs, oldById){
       case 'kill': {
         const d = UT[e.type], u = unitOf(e.id);
         if (e.v){
+          map.obst[cellIdx(map, e.x, e.y)] = 1;
           APP.wrecks.push({ x:e.x, y:e.y, h:e.h/100, ta:e.ta/100 + (Math.random() - .5)*.8, type:e.type, t0:now });
           addDecal(APP.mapCv, { k:'scorch', x:e.x, y:e.y, r:11 });
           APP.burning.push({ x:e.x, y:e.y, until:now + 35000 + Math.random()*20000, big:false, acc:0 });
@@ -1980,9 +2134,10 @@ function addFx(evs, oldById){
         addPing(e.x, e.y, '#e8e2c9', 5000);
         break;
       }
+      case 'buyfail': if (e.side === me) addLog('Выйти в этом доме не удалось: рядом противник. Очки не списаны.', 'bad', { x:e.x, y:e.y }); break;
       case 'arr':
         if (e.side === me){
-          addLog('Прибыло подкрепление: ' + UT[e.type].name + ', ' + gridRef(e.x, e.y) + '.', 'arr', { x:e.x, y:e.y });
+          addLog((e.inf ? 'Вышли из подвала: ' : 'Прибыло подкрепление: ') + UT[e.type].name + ', ' + gridRef(e.x, e.y) + '.', 'arr', { x:e.x, y:e.y });
           addPing(e.x, e.y, REL.own, 9000, UT[e.type].name); APP.newUnits.set(e.id, now);
         }
         break;
@@ -2077,8 +2232,19 @@ function drawUnit(u, now, models, s){
     const pal = UNIF[u.side], m = ws*1.6, pinned = u.supp >= 70;
     const tubes = d.weapons.reduce((n, w, i) => n + (w.k === 'at' && u.ammo[i] !== 0 ? (d.key === 'c_rpg' ? 2 : 1) : 0), 0);
     const order = slots.map((p, i) => [p, i]).sort((a, b) => a[0][1] - b[0][1]);
-    for (const [p, i] of order) drawMan(ctx, u.rx + p[0]*ws*1.9, u.ry + p[1]*ws*1.9, m, pal, (u.id*7 + i*13) & 255, u.rh, pinned, true, i < tubes);
-    top = 4*m + 3*ws;
+    const lift = u.inB ? 9*ws : 0;
+    if (u.inB){
+      // бойцы на верхних этажах: «срез» этажа над крышей
+      const W2 = 13*ws, H2 = 9*ws, fx = u.rx - W2/2, fy = u.ry - lift - H2*.6;
+      ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.fillRect(fx + 2*ws, u.ry - H2*.3, W2, H2*.6);
+      ctx.strokeStyle = own ? 'rgba(79,179,255,.75)' : 'rgba(255,77,61,.8)'; ctx.lineWidth = 1.2/z; ctx.setLineDash([]);
+      for (let k = 0; k < 3; k++){ const yy = u.ry - k*lift/3; ctx.globalAlpha = .25 + k*.2; ctx.beginPath(); ctx.moveTo(fx, yy); ctx.lineTo(fx + W2, yy); ctx.stroke(); }
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = own ? 'rgba(20,40,60,.55)' : 'rgba(60,20,16,.55)'; ctx.fillRect(fx, fy, W2, H2);
+      ctx.strokeRect(fx, fy, W2, H2);
+    }
+    for (const [p, i] of order) drawMan(ctx, u.rx + p[0]*ws*1.2*(u.inB ? .8 : 1.6), u.ry - lift + p[1]*ws*(u.inB ? .7 : 1.9), m, pal, (u.id*7 + i*13) & 255, u.rh, pinned, true, i < tubes);
+    top = 4*m + 3*ws + lift;
   }
   return top;
 }
@@ -2094,7 +2260,11 @@ function drawBars(u, top, now){
   if (own){ const cg = APP.view.units.find(c => c.carrier === u.id); if (cg){ ctx.fillStyle = REL.own; ctx.font = `bold ${11/z}px "PT Sans Narrow",sans-serif`; ctx.fillText('десант ' + Math.max(1, Math.ceil(cg.hp/(UT[cg.type].hp/UT[cg.type].men))), u.rx + 26/z, by + 5/z); } }
   if (u.supp >= 70){ ctx.fillStyle = '#f2d36b'; ctx.font = `bold ${12/z}px "PT Sans Narrow",sans-serif`; ctx.fillText('прижат', u.rx, by - 3/z); }
   else if (tag && (own || u.immob)){ ctx.fillStyle = u.immob ? '#ff9a7a' : '#f2d36b'; ctx.font = `bold ${11/z}px "PT Sans Narrow",sans-serif`; ctx.fillText(tag, u.rx, by - 3/z); }
-  else if (own && u.inB){ ctx.fillStyle = '#efe9d4'; ctx.font = `${11/z}px "PT Sans Narrow",sans-serif`; ctx.fillText('в здании', u.rx, by - 3/z); }
+  else if (u.inB){
+    const dz = !own && APP.view.units.some(t => t.side === me && APP.sel.has(t.id) && UT[t.type].weapons.some(w => w.lowElev) && Math.hypot(t.x - u.x, t.y - u.y) < 70);
+    ctx.fillStyle = dz ? '#ff9a7a' : own ? '#cfe6fa' : '#ffc4bb'; ctx.font = `${11/z}px "PT Sans Narrow",sans-serif`;
+    ctx.fillText(dz ? 'выше угла пушки' : 'верхние этажи', u.rx, by - 3/z);
+  }
   const nt = APP.newUnits.get(u.id);
   if (nt && now - nt < 9000){
     const k = ((now - nt)/900) % 1;
@@ -2185,6 +2355,15 @@ function frame(now){
   ctx.imageSmoothingEnabled = z < 1;
   ctx.drawImage(APP.mapCv, 0, 0);
   ctx.imageSmoothingEnabled = true;
+  if (APP.placing && (APP.placing.startsWith('eng:') || (me === 'chr' && UT[APP.placing] && UT[APP.placing].cls === 'inf'))){
+    const eng = APP.placing.startsWith('eng:'), tl = toWorld(0, 0), br = toWorld(cw, ch), m = APP.map, pg = pseudoG();
+    const x0 = Math.max(0, Math.floor(tl.x/CELL)), x1 = Math.min(m.W - 1, Math.ceil(br.x/CELL)), y0 = Math.max(0, Math.floor(tl.y/CELL)), y1 = Math.min(m.H - 1, Math.ceil(br.y/CELL));
+    ctx.fillStyle = eng ? 'rgba(242,211,107,.16)' : 'rgba(79,179,255,.28)';
+    for (let yy = y0; yy <= y1; yy++) for (let xx = x0; xx <= x1; xx++){
+      const cx = xx*CELL + 10, cy = yy*CELL + 10;
+      if (eng ? engOk(pg, me, cx, cy) : infilOk(pg, me, APP.placing, cx, cy)) ctx.fillRect(xx*CELL, yy*CELL, CELL, CELL);
+    }
+  }
   if (v.phase === 'deploy') for (const s of SIDES) for (const r of APP.sc.deploy[s]){
     ctx.fillStyle = s === me ? 'rgba(79,179,255,.14)' : 'rgba(30,30,30,.12)';
     ctx.fillRect(r.x, r.y, r.w, r.h); ctx.setLineDash([12/z, 8/z]); ctx.lineWidth = 2/z; ctx.strokeStyle = s === me ? REL.own : '#6b6a60'; ctx.strokeRect(r.x, r.y, r.w, r.h); ctx.setLineDash([]);
@@ -2229,6 +2408,11 @@ function frame(now){
     ctx.strokeStyle = u.fast ? 'rgba(240,200,90,.85)' : 'rgba(240,235,210,.75)'; ctx.lineWidth = 1.5/z; ctx.setLineDash([5/z, 5/z]); ctx.beginPath(); ctx.moveTo(u.rx, u.ry); ctx.lineTo(u.dest.x, u.dest.y); ctx.stroke(); ctx.setLineDash([]);
     ctx.fillStyle = 'rgba(240,235,210,.8)'; ctx.beginPath(); ctx.arc(u.dest.x, u.dest.y, 3/z, 0, 7); ctx.fill();
   }
+  for (const u of shown) if (u.side === me && u.afire && APP.sel.has(u.id)){ ctx.strokeStyle = 'rgba(255,138,58,.7)'; ctx.lineWidth = 1.2/z; ctx.setLineDash([3/z, 4/z]); ctx.beginPath(); ctx.moveTo(u.rx, u.ry); ctx.lineTo(u.afire.x, u.afire.y); ctx.stroke(); ctx.setLineDash([]); ctx.beginPath(); ctx.arc(u.afire.x, u.afire.y, 8/z, 0, 7); ctx.stroke(); }
+  for (const u of shown) if (u.side === me && APP.sel.has(u.id) && UT[u.type].weapons.some(w => w.lowElev)){
+    ctx.strokeStyle = 'rgba(255,90,70,.55)'; ctx.lineWidth = 1.5/z; ctx.setLineDash([2/z, 5/z]); ctx.beginPath(); ctx.arc(u.rx, u.ry, 70, 0, 7); ctx.stroke(); ctx.setLineDash([]);
+    if (APP.sel.size === 1){ ctx.fillStyle = 'rgba(255,140,120,.9)'; ctx.font = `${11/z}px "PT Sans Narrow",sans-serif`; ctx.textAlign = 'center'; ctx.fillText('пушка не достаёт верхние этажи', u.rx, u.ry + 70 + 12/z); }
+  }
   for (const u of shown) if (u.side === me && APP.sel.has(u.id) && APP.sel.size <= 3 && UT[u.type].maxRange){ ctx.strokeStyle = 'rgba(242,211,107,.35)'; ctx.lineWidth = 1/z; ctx.beginPath(); ctx.arc(u.rx, u.ry, UT[u.type].maxRange, 0, 7); ctx.stroke(); }
   const tops = new Map();
   for (const u of shown) tops.set(u.id, drawUnit(u, now, models, s));
@@ -2259,6 +2443,11 @@ function frame(now){
   APP.fx = APP.fx.filter(f => now - f.t0 < f.d);
   for (const f of APP.fx){
     const k = (now - f.t0)/f.d;
+    if (f.k === 'flashmark'){
+      ctx.globalAlpha = 1 - k; ctx.strokeStyle = '#ffb347'; ctx.lineWidth = 2/z;
+      ctx.beginPath(); for (let i = 0; i < 8; i++){ const a = i/8*Math.PI*2; ctx.moveTo(f.x + Math.cos(a)*4/z, f.y + Math.sin(a)*4/z); ctx.lineTo(f.x + Math.cos(a)*10/z, f.y + Math.sin(a)*10/z); } ctx.stroke();
+      ctx.globalAlpha = 1; continue;
+    }
     if (f.k === 'fall'){
       const h = (1 - k)*260, off = (1 - k)*50;
       ctx.globalAlpha = .8; ctx.strokeStyle = v.night ? '#c9c2b0' : '#2b2620'; ctx.lineWidth = (f.big ? 3 : 2)/z; ctx.beginPath(); ctx.moveTo(f.x + off, f.y - h - 18/z); ctx.lineTo(f.x + off*.9, f.y - h); ctx.stroke();
@@ -2295,15 +2484,15 @@ function frame(now){
   if (APP.placing && APP.mouse){
     const w = toWorld(APP.mouse.x, APP.mouse.y);
     if (APP.placing.startsWith('eng:')){
-      const k = APP.placing.slice(4), ok = inRects(APP.sc.deploy[me], w.x, w.y) && ENG_OK.has(terrAt(APP.map, w.x, w.y));
+      const k = APP.placing.slice(4), ok = engOkC(w.x, w.y);
       ctx.globalAlpha = ok ? .85 : .3;
       if (k === 'barr'){ const cx = Math.floor(w.x/CELL)*CELL, cy = Math.floor(w.y/CELL)*CELL; ctx.fillStyle = '#6d6a63'; ctx.fillRect(cx, cy, CELL, CELL); ctx.strokeStyle = REL.own; ctx.lineWidth = 2/z; ctx.strokeRect(cx, cy, CELL, CELL); }
       else drawMine(w.x, w.y, true, z);
       ctx.globalAlpha = 1;
-    } else { const d = UT[APP.placing]; const ok = inRects(APP.sc.deploy[me], w.x, w.y) && passableAt(APP.map, d.mc, w.x, w.y); drawIcon(ctx, w.x, w.y, s, d, true, ok ? .85 : .3, false); }
+    } else { const d = UT[APP.placing]; const ok = (v.phase === 'deploy' && inRects(APP.sc.deploy[me], w.x, w.y) && passableAt(APP.map, d.mc, w.x, w.y)) || infilOkC(APP.placing, w.x, w.y); drawIcon(ctx, w.x, w.y, s, d, true, ok ? .85 : .3, false); }
   }
   if (APP.targeting && APP.mouse){
-    const w = toWorld(APP.mouse.x, APP.mouse.y), R = APP.targeting === 'smoke' ? AB2[me].scatter*1.4 : APP.targeting === 'flare' ? FLARE.r : AB[me].scatter*1.6;
+    const w = toWorld(APP.mouse.x, APP.mouse.y), R = APP.targeting === 'smoke' ? AB2[me].scatter*1.4 : APP.targeting === 'flare' ? FLARE.r : APP.targeting === 'afire' ? 25 : AB[me].scatter*1.6;
     ctx.strokeStyle = APP.targeting === 'smoke' ? '#e0e0d8' : APP.targeting === 'flare' ? '#fff3c4' : '#ff8a3a'; ctx.lineWidth = 2/z;
     ctx.beginPath(); ctx.arc(w.x, w.y, R, 0, 7); ctx.stroke(); ctx.beginPath(); ctx.moveTo(w.x - 12/z, w.y); ctx.lineTo(w.x + 12/z, w.y); ctx.moveTo(w.x, w.y - 12/z); ctx.lineTo(w.x, w.y + 12/z); ctx.stroke();
   }
@@ -2321,6 +2510,10 @@ function frame(now){
   }
   if (APP.drag && APP.drag.box){ const d = APP.drag; ctx.strokeStyle = REL.sel; ctx.lineWidth = 1; ctx.fillStyle = 'rgba(242,211,107,.08)'; ctx.fillRect(d.x0, d.y0, d.x1 - d.x0, d.y1 - d.y0); ctx.strokeRect(d.x0, d.y0, d.x1 - d.x0, d.y1 - d.y0); }
   drawMini(now, units);
+  if (now - (APP.engT || 0) > 120){
+    APP.engT = now;
+    updateEngines(shown.filter(u => UT[u.type].cls === 'veh').map(u => ({ type:u.type, moving:u.moving, vol:camVol(u.rx, u.ry) })));
+  }
   requestAnimationFrame(frame);
 }
 
@@ -2408,6 +2601,10 @@ addEventListener('mouseup', e => {
     const w = toWorld(e.clientX, e.clientY);
     if (APP.placing){
       if (APP.placing.startsWith('eng:')) sendCmd({ c:'eng', k:APP.placing.slice(4), x:w.x, y:w.y });
+      else if (APP.view.phase === 'battle'){
+        if (!infilOkC(APP.placing, w.x, w.y)){ toast('Сюда нельзя: нужен жилой дом не ближе 220 м к противнику'); return; }
+        sendCmd({ c:'buy', type:APP.placing, x:w.x, y:w.y }); addLog(UT[APP.placing].name + ' выйдет из подвала через ' + (ARRIVE + 3) + ' с, ' + gridRef(w.x, w.y) + '.', 'sys', { x:w.x, y:w.y }); APP.placing = null; setTimeout(buildDeck, 80); updateHud(); return;
+      }
       else sendCmd({ c:'deploy', type:APP.placing, x:w.x, y:w.y });
       if (!e.shiftKey) APP.placing = null; setTimeout(buildDeck, 60); updateHud(); return;
     }
@@ -2415,6 +2612,7 @@ addEventListener('mouseup', e => {
       const t = APP.targeting; APP.targeting = false;
       if (t === 'smoke'){ sendCmd({ c:'asmoke', x:w.x, y:w.y }); addLog(AB2[me].name + ': запрошены, ' + gridRef(w.x, w.y) + '.', 'sys', { x:w.x, y:w.y }); }
       else if (t === 'flare') sendCmd({ c:'flare', x:w.x, y:w.y });
+      else if (t === 'afire'){ sendCmd({ c:'afire', ids:selOwn().map(u => u.id), x:w.x, y:w.y }); addPing(w.x, w.y, '#ff8a3a', 1500); }
       else { sendCmd({ c:'ability', x:w.x, y:w.y }); addLog(AB[me].name + ': огонь запрошен, ' + gridRef(w.x, w.y) + '.', 'sys', { x:w.x, y:w.y }); }
       updateHud(); return;
     }
@@ -2471,6 +2669,7 @@ addEventListener('keydown', e => {
   if (e.code === 'KeyE') toggleAbility('flare');
   if (e.code === 'KeyG') unitSmoke();
   if (e.code === 'KeyU') unloadSel();
+  if (e.code === 'KeyT'){ if (APP.view.phase === 'battle' && selOwn().length){ APP.targeting = APP.targeting === 'afire' ? false : 'afire'; APP.placing = null; updateHud(); } }
   if (e.code === 'KeyV') cycleView();
   if (e.code === 'KeyM') toggleSound();
   if ((e.code === 'Delete' || e.code === 'Backspace') && APP.view.phase === 'deploy' && ids.length){ sendCmd({ c:'undeploy', ids }); APP.sel.clear(); setTimeout(buildDeck, 60); }
@@ -2520,7 +2719,7 @@ function deckClick(k){
   if (v.phase === 'end' || v.phase === 'inter') return;
   if (k.startsWith('eng:')){
     const E = ENG[k.slice(4)];
-    if ((S.eng[k.slice(4)] || 0) >= E.limit){ toast('Лимит: ' + E.name); return; }
+    if ((S.eng[k.slice(4)] || 0) >= E.lim[APP.side]){ toast('Лимит: ' + E.name); return; }
     if (S.p < E.cost){ toast('Не хватает очков: нужно ' + E.cost); return; }
     APP.placing = APP.placing === k ? null : k; APP.targeting = false; updateHud(); return;
   }
@@ -2528,7 +2727,8 @@ function deckClick(k){
   if ((S.used[k] || 0) >= d.limit){ toast('Лимит: ' + d.name + ' больше нет'); return; }
   if (S.p < d.cost){ toast('Не хватает очков: нужно ' + d.cost); return; }
   if (v.phase === 'deploy'){ APP.placing = APP.placing === k ? null : k; APP.targeting = false; }
-  else { sendCmd({ c:'buy', type:k }); addLog('Вызвано подкрепление: ' + d.name + ', прибудет через ' + ARRIVE + ' с.', 'sys'); setTimeout(buildDeck, 80); }
+  else if (APP.side === 'chr' && d.cls === 'inf' && APP.placing !== k){ APP.placing = k; APP.targeting = false; }
+  else { APP.placing = null; sendCmd({ c:'buy', type:k }); addLog('Вызвано подкрепление: ' + d.name + ', прибудет с края карты через ' + ARRIVE + ' с.', 'sys'); setTimeout(buildDeck, 80); }
   updateHud();
 }
 function buildDeck(){
@@ -2537,8 +2737,9 @@ function buildDeck(){
   box.innerHTML = '';
   if (APP.view.phase === 'deploy'){
     const h = document.createElement('div'); h.className = 'deck-h'; h.textContent = 'Инженерная подготовка'; box.appendChild(h);
-    for (const ek of Object.keys(ENG)){
-      const E = ENG[ek], k = 'eng:' + ek, left = E.limit - ((S.eng || {})[ek] || 0);
+    if (APP.side !== APP.sc.defender){ const n = document.createElement('p'); n.className = 'deck-n'; n.textContent = APP.side === 'fed' ? 'Мины и баррикады ставит обороняющийся. У вас есть сапёры: они находят мины за 70 м и снимают их.' : 'Мины и баррикады ставит обороняющийся. Зато ваша пехота может выйти из любого жилого дома вдали от противника.'; box.appendChild(n); }
+    else for (const ek of Object.keys(ENG)){
+      const E = ENG[ek], k = 'eng:' + ek, left = E.lim[APP.side] - ((S.eng || {})[ek] || 0);
       const b = document.createElement('button'); b.className = 'card eng' + (APP.placing === k ? ' on' : '');
       b.disabled = left <= 0 || S.p < E.cost; b.dataset.k = k;
       b.innerHTML = `<span class="ck"></span><span class="cn"></span><span class="cc">${E.cost}</span><span class="cl">×${left}</span>`;
@@ -2575,14 +2776,20 @@ function updateHud(){
   const so = selOwn();
   $('#b-smoke').hidden = v.phase !== 'battle' || !so.some(u => u.smk > 0);
   $('#b-unload').hidden = !so.some(u => v.units.some(c => c.carrier === u.id));
+  const af = $('#b-afire'); af.hidden = v.phase !== 'battle' || !so.length; af.classList.toggle('on', APP.targeting === 'afire');
   const fb = $('#b-fast'); fb.hidden = v.phase !== 'battle'; fb.classList.toggle('on', APP.fastNext);
   $('#b-stop').hidden = v.phase !== 'battle';
   $('#b-snd').textContent = SND.on ? 'Звук: вкл' : 'Звук: выкл';
   $('#b-view').textContent = { auto:'Вид: авто', models:'Вид: модели', icons:'Вид: знаки' }[APP.viewMode];
-  $('#hint').textContent = APP.placing ? 'Щелчок в своей зоне ставит отряд, Shift+щелчок — несколько. Правая кнопка отменяет.'
+  $('#hint').textContent = APP.placing && v.phase === 'deploy' && me === 'chr' && UT[APP.placing] && UT[APP.placing].cls === 'inf' ? 'Пехоту можно ставить в своей зоне или в любом подсвеченном жилом доме. Shift+щелчок — несколько.'
+    : APP.placing && v.phase === 'battle' ? 'Подсвечены жилые дома, где отряд выйдет из подвала: не ближе 220 м к противнику. Щёлкните карточку ещё раз, чтобы вызвать его с края карты.'
+    : APP.placing && !APP.placing.startsWith('eng:') ? 'Щелчок в своей зоне ставит отряд, Shift+щелчок — несколько. Правая кнопка отменяет.'
     : APP.placing && APP.placing.startsWith('eng:') ? 'Щелчок по улице или двору в своей зоне. Правый щелчок по поставленному убирает его и возвращает очки.'
     : APP.targeting === 'smoke' ? 'Щёлкните по карте: дымовая завеса встанет через несколько секунд и закроет обзор примерно на минуту.'
     : APP.targeting === 'flare' ? 'Щёлкните по карте: ракета осветит круг радиусом 260 м на полминуты. Свет видят обе стороны.'
+    : APP.targeting === 'afire' ? 'Щёлкните по дому или точке: выбранные будут 40 с вести огонь туда, даже не видя противника. Фугасы рушат стены, пулемёты прижимают.'
+    : APP.placing && v.phase === 'battle' ? 'Подсвечены жилые дома, где отряд может выйти из подвала: не ближе 220 м к противнику. Щёлкните карточку ещё раз, чтобы вызвать его с края карты.'
+    : APP.placing && me === 'chr' && UT[APP.placing] && UT[APP.placing].cls === 'inf' ? 'Пехоту можно ставить в своей зоне или в любом подсвеченном жилом доме.'
     : APP.targeting ? 'Щёлкните по карте, чтобы вызвать огонь. Снаряды ложатся с рассеиванием и бьют по всем, включая мирных жителей.'
     : v.phase === 'deploy' ? 'Выберите отряд в колоде и поставьте в своей зоне. Выбранную пехоту можно сразу посадить в БТР или БМП правым щелчком по машине.'
     : APP.fastNext ? 'Следующий приказ на движение будет бегом: быстрее, но без стрельбы.' : '';
@@ -2599,7 +2806,8 @@ function updateSel(){
     const st = [u.immob ? 'ходовая разбита, машина обездвижена' : null, u.working === 'mine' ? 'снимает мину' : u.working === 'barr' ? 'разбирает баррикаду' : null, u.boarding ? 'идёт на посадку' : null,
       u.supp >= 70 ? 'прижат огнём' : u.supp > 30 ? 'под огнём' : null, u.inB ? 'в здании' : null, u.fast ? 'бегом' : u.moving ? 'движется' : 'на месте'].filter(Boolean).join(', ');
     const cg = v.units.find(c => c.carrier === u.id);
-    const extra = (d.cap ? `<p class="arm">Десант: ${cg ? UT[cg.type].name + ', ' + Math.max(1, Math.ceil(cg.hp/(UT[cg.type].hp/UT[cg.type].men))) + ' чел. Высадить: U' : 'пусто. Выберите пехоту и щёлкните правой по машине'}</p>` : '') + (d.smk ? `<p class="arm">Дымовых зарядов: ${u.smk} (G)</p>` : '');
+    const elev = d.weapons.some(w => w.lowElev) ? '<p class="arm">Пушка не поднимается на верхние этажи ближе 70 м (красный круг). Отойдите дальше или приведите БМП-2 и «Шилку».</p>' : '';
+    const extra = elev + (d.cap ? `<p class="arm">Десант: ${cg ? UT[cg.type].name + ', ' + Math.max(1, Math.ceil(cg.hp/(UT[cg.type].hp/UT[cg.type].men))) + ' чел. Высадить: U' : 'пусто. Выберите пехоту и щёлкните правой по машине'}</p>` : '') + (d.smk ? `<p class="arm">Дымовых зарядов: ${u.smk} (G)</p>` : '');
     const men = d.cls === 'inf' ? `, в строю ${Math.max(1, Math.ceil(u.hp/(d.hp/d.men)))} из ${d.men}` : '';
     const ws = d.weapons.map((w, i) => `<li>${w.n}<span>${w.r} м${u.ammo[i] >= 0 ? ', выстрелов: ' + u.ammo[i] : ''}</span></li>`).join('');
     const arm = d.armor ? `<p class="arm">Броня, мм: лоб ${d.armor.f}, борт ${d.armor.s}, корма ${d.armor.r}, крыша ${d.armor.t}</p>` : '';
@@ -2614,7 +2822,7 @@ function buildDeckLight(){
   const S = APP.view.sides[APP.side];
   for (const b of document.querySelectorAll('#deck-list .card')){
     const k = b.dataset.k; let left, cost;
-    if (k.startsWith('eng:')){ const E = ENG[k.slice(4)]; left = E.limit - ((S.eng || {})[k.slice(4)] || 0); cost = E.cost; }
+    if (k.startsWith('eng:')){ const E = ENG[k.slice(4)]; left = E.lim[APP.side] - ((S.eng || {})[k.slice(4)] || 0); cost = E.cost; }
     else { const d = UT[k]; left = d.limit - (S.used[k] || 0); cost = d.cost; }
     b.disabled = left <= 0 || S.p < cost; b.querySelector('.cl').textContent = '×' + left; b.classList.toggle('on', APP.placing === k);
   }
@@ -2625,6 +2833,7 @@ $('#b-asmoke').onclick = () => toggleAbility('smoke');
 $('#b-flare').onclick = () => toggleAbility('flare');
 $('#b-smoke').onclick = unitSmoke;
 $('#b-unload').onclick = unloadSel;
+$('#b-afire').onclick = () => { if (APP.view.phase === 'battle' && selOwn().length){ APP.targeting = APP.targeting === 'afire' ? false : 'afire'; updateHud(); } };
 $('#b-fast').onclick = () => { APP.fastNext = !APP.fastNext; updateHud(); };
 $('#b-stop').onclick = () => { if (APP.sel.size) sendCmd({ c:'stop', ids:[...APP.sel] }); };
 $('#b-snd').onclick = toggleSound;
