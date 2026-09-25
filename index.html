@@ -114,6 +114,26 @@ input{font:inherit;font-size:28px;letter-spacing:.2em;text-transform:uppercase;w
 #rp-seek{flex:1;width:auto;font-size:14px;letter-spacing:0;padding:0;accent-color:var(--brass)}
 #rp-time{min-width:96px;text-align:center;color:var(--brass)}
 body.replay #deck,body.replay #cmd,body.replay #hint,body.replay #sel,body.replay #chat-in{display:none!important}
+#music{position:fixed;right:10px;top:64px;width:340px;max-height:calc(100vh - 80px);overflow:auto;background:#25282b;box-shadow:0 6px 24px rgba(0,0,0,.45);border:1px solid var(--line);border-radius:4px;padding:10px 12px;z-index:40}
+#music header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:18px}
+#music header button{padding:2px 10px}
+#music .tabs{display:flex;gap:4px;margin-bottom:6px}#music .tabs button{flex:1;padding:5px 6px}
+#mu-list{max-height:34vh;overflow:auto;margin-bottom:8px}
+.mu-row{display:flex;gap:4px;margin-bottom:3px}.mu-row .mu-name{flex:1;text-align:left;padding:5px 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mu-row button{padding:4px 8px}.mu-row.cur .mu-name{border-color:var(--brass);background:#4a4230}
+.mu-ctl{display:flex;gap:4px;margin-bottom:6px}.mu-ctl button{flex:1;padding:6px 4px}
+.mu-vol{display:flex;gap:8px;align-items:center;margin-bottom:8px;font-size:15px}
+#music input[type=range]{flex:1;width:auto;padding:0;accent-color:var(--brass)}
+.mu-add{display:flex;gap:6px;margin-bottom:6px}
+#mu-url{flex:1;width:auto;font-size:14px;letter-spacing:0;text-transform:none;font-family:var(--f);padding:5px 8px}
+.filebtn{display:block;width:100%;text-align:center;background:var(--panel2);border:1px solid var(--line);border-radius:3px;padding:7px;cursor:pointer}
+.filebtn:hover{background:#3b4047}.filebtn input{position:absolute;width:1px;height:1px;opacity:0}
+.filebtn:focus-within{outline:2px solid var(--brass)}
+.mu-chk{display:flex;gap:8px;align-items:flex-start;font-size:14.5px;margin:4px 0}
+.mu-chk input{width:auto;margin-top:3px}
+#music p.meta{font-size:13.5px;margin:4px 0}
+#mu-now{position:fixed;right:10px;top:282px;max-width:264px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;padding:3px 8px;background:var(--panel)}
+body.replay #mu-now{display:block}
 #toasts{position:fixed;top:110px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none}
 .toast{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--brass);padding:6px 12px;border-radius:3px;font-size:15px}
 .toast.bad{border-left-color:var(--bad)}
@@ -151,7 +171,8 @@ body.replay #deck,body.replay #cmd,body.replay #hint,body.replay #sel,body.repla
     <input id="chat-in" maxlength="200" placeholder="Сообщение сопернику (Enter)" autocomplete="off" aria-label="Сообщение в чат">
   </div>
   <canvas id="mini" aria-label="Мини-карта"></canvas>
-  <div id="tools"><button id="b-view"></button><button id="b-snd"></button></div>
+  <div id="tools"><button id="b-view"></button><button id="b-snd"></button><button id="b-music">Музыка</button></div>
+  <button id="mu-now" hidden></button>
   <button id="b-res" hidden>Итоги</button>
   <div id="sel" hidden></div>
   <div id="hint"></div>
@@ -170,6 +191,19 @@ body.replay #deck,body.replay #cmd,body.replay #hint,body.replay #sel,body.repla
   <div id="toasts" aria-live="polite"></div>
 </div>
 
+<div id="music" hidden role="dialog" aria-label="Музыка">
+  <header><b>Музыка</b><button id="mu-close" aria-label="Закрыть">×</button></header>
+  <div class="tabs"><button data-s="fed">Федеральные силы</button><button data-s="chr">ВС ЧРИ</button></div>
+  <div id="mu-list"></div>
+  <div class="mu-ctl"><button id="mu-prev">Назад</button><button id="mu-play" class="go">Играть</button><button id="mu-next">Дальше</button><button id="mu-shuf">Вперемешку</button></div>
+  <label class="mu-vol">Громкость <input type="range" id="mu-vol" min="0" max="100"></label>
+  <div class="mu-add"><label class="filebtn">Добавить файлы<input type="file" id="mu-file" accept="audio/*,.mp3,.ogg,.m4a,.flac,.opus" multiple></label></div>
+  <div class="mu-add"><input id="mu-url" placeholder="или прямая ссылка на аудиофайл" autocomplete="off" aria-label="Ссылка на аудиофайл"><button id="mu-addurl">Добавить</button></div>
+  <label class="mu-chk"><input type="checkbox" id="mu-auto"> Включать плейлист своей стороны в начале боя и при смене сторон</label>
+  <p class="meta" id="mu-side"></p>
+  <p class="meta" id="mu-note" aria-live="polite"></p>
+  <p class="meta" id="mu-store">Треки хранятся только в этом браузере и слышны только вам. У друга свой плейлист. Клавиши: N — следующий, Shift+N — предыдущий, P — пауза.</p>
+</div>
 <div id="replay" hidden><button id="rp-play">Пауза</button><button id="rp-speed">×2</button><input id="rp-seek" type="range" min="0" max="1000" value="0" aria-label="Время повтора"><span id="rp-time"></span><button id="rp-vis">Видно всё</button><button id="rp-exit">Выйти из повтора</button></div>
 <div id="round" hidden><div class="box"><div id="round-body"></div></div></div>
 <div id="end" hidden><div class="box"><div id="end-body"></div>
@@ -186,6 +220,7 @@ body.replay #deck,body.replay #cmd,body.replay #hint,body.replay #sel,body.repla
       <button id="m-join">Подключиться по коду</button>
       <button id="m-solo">Бой против бота</button>
       <button id="m-help">Как играть</button>
+      <button id="m-music">Музыка</button>
       <p>Карты схематичны, характеристики упрощены. Сценарии основаны на реальных событиях 1994–1996 годов.</p>
     </div>
   </section>
@@ -246,6 +281,7 @@ body.replay #deck,body.replay #cmd,body.replay #hint,body.replay #sel,body.repla
         <dt>Enter</dt><dd>написать в чат; Esc — вернуться к карте</dd>
         <dt>V</dt><dd>модели, тактические знаки или автоматически по масштабу</dd>
         <dt>M</dt><dd>включить или выключить звук</dd>
+        <dt>N, Shift+N, P</dt><dd>музыка: следующий трек, предыдущий, пауза</dd>
         <dt>Мини-карта</dt><dd>левая кнопка переносит камеру, правая отправляет выбранные отряды</dd>
       </dl>
       <h4>Что важно знать</h4>
@@ -2060,6 +2096,7 @@ function setView(v){
   if (APP.side0){ const want = v.round === 2 ? other(APP.side0) : APP.side0; if (APP.side !== want){ APP.side = want; onRoundSwap(); } }
 }
 function onRoundSwap(){
+  musSetSide(APP.side);
   APP.sel.clear(); APP.placing = null; APP.targeting = false; APP.ghosts.clear(); APP.newUnits.clear(); APP.pings = []; APP.ai = {}; APP.trk.clear();
   const z = APP.sc.deploy[APP.side][0]; APP.cam.x = z.x + z.w/2; APP.cam.y = z.y + z.h/2; clampCam();
   $('#round').hidden = true; APP.roundShown = false; buildDeck();
@@ -2079,6 +2116,7 @@ function startGame(mode, scn, seed, side, opts){
   const z = APP.sc.deploy[side][0]; APP.cam.x = z.x + z.w/2; APP.cam.y = z.y + z.h/2; APP.cam.z = .8; clampCam();
   hideMenu(); $('#hud').hidden = false; $('#end').hidden = true; buildDeck(); updateHud(); resize();
   addLog(APP.sc.title + ', ' + APP.sc.date + '. Вы: ' + SIDE_NAME[side] + '.', 'sys');
+  musSetSide(side);
   addLog('Задача: ' + APP.sc.goals[side], 'sys');
   if (g.rounds === 2) addLog('Бой из двух этапов. Сейчас у вас ' + roleOf(side) + ', во втором этапе стороны поменяются, а город останется таким, каким вы его оставите.', 'sys');
   if (g.night) addLog('Ночь: видимость вдвое меньше, выстрелы выдают стрелка. Осветительная ракета — клавиша E.', 'sys');
@@ -2889,6 +2927,8 @@ addEventListener('keydown', e => {
   if (e.code === 'KeyT'){ if (APP.view.phase === 'battle' && selOwn().length){ APP.targeting = APP.targeting === 'afire' ? false : 'afire'; APP.placing = null; updateHud(); } }
   if (e.code === 'KeyV') cycleView();
   if (e.code === 'KeyM') toggleSound();
+  if (e.code === 'KeyN'){ if (e.shiftKey) musNext(-1); else musNext(1); }
+  if (e.code === 'KeyP') musToggle();
   if ((e.code === 'Delete' || e.code === 'Backspace') && APP.view.phase === 'deploy' && ids.length){ sendCmd({ c:'undeploy', ids }); APP.sel.clear(); setTimeout(buildDeck, 60); }
   if (e.code === 'KeyA' && e.ctrlKey){ e.preventDefault(); for (const u of APP.view.units) if (u.side === APP.side) APP.sel.add(u.id); updateSel(); }
   if (e.code === 'Space') e.preventDefault();
@@ -3176,6 +3216,118 @@ $('#j-go').onclick = () => joinLobby($('#j-code').value);
 $('#j-code').addEventListener('keydown', e => { if (e.key === 'Enter') joinLobby($('#j-code').value); });
 $('#j-back').onclick = () => toMenu();
 $('#h-back').onclick = () => showScreen('main');
+
+
+/* ---------- Музыка: плейлисты сторон ---------- */
+const MUS = { db:null, tracks:[], audio:new Audio(), side:'fed', tab:'fed', cur:null, url:null, vol:.5, auto:true, shuffle:false };
+MUS.audio.preload = 'auto';
+try { const st = JSON.parse(localStorage.getItem('grz-music-set') || '{}'); if (st.vol !== undefined) MUS.vol = st.vol; if (st.auto !== undefined) MUS.auto = st.auto; if (st.shuffle !== undefined) MUS.shuffle = st.shuffle; } catch(e){}
+const musSave = () => { try { localStorage.setItem('grz-music-set', JSON.stringify({ vol:MUS.vol, auto:MUS.auto, shuffle:MUS.shuffle })); } catch(e){} };
+function musDb(){
+  return new Promise((res, rej) => {
+    if (MUS.db) return res(MUS.db);
+    if (!window.indexedDB) return rej(new Error('no idb'));
+    const r = indexedDB.open('grz-music', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('tracks', { keyPath:'id' });
+    r.onsuccess = () => { MUS.db = r.result; res(MUS.db); }; r.onerror = () => rej(r.error);
+  });
+}
+async function musLoad(){
+  try { const db = await musDb(); const req = db.transaction('tracks', 'readonly').objectStore('tracks').getAll();
+    req.onsuccess = () => { MUS.tracks = req.result.sort((a, b) => a.order - b.order); renderMusic(); };
+  } catch(e){ MUS.noDb = true; renderMusic(); }
+}
+async function musPut(t){ try { const db = await musDb(); db.transaction('tracks', 'readwrite').objectStore('tracks').put(t); } catch(e){} }
+async function musDel(id){ try { const db = await musDb(); db.transaction('tracks', 'readwrite').objectStore('tracks').delete(id); } catch(e){} }
+const musList = side => MUS.tracks.filter(t => t.side === side);
+function musPlay(t){
+  if (!t) return;
+  if (MUS.url){ URL.revokeObjectURL(MUS.url); MUS.url = null; }
+  if (t.blob){ MUS.url = URL.createObjectURL(t.blob); MUS.audio.src = MUS.url; } else MUS.audio.src = t.url;
+  MUS.cur = t.id; MUS.audio.volume = MUS.vol;
+  MUS.audio.play().then(() => renderMusic()).catch(() => { renderMusic(); musNote('Не удалось включить «' + t.name + '». Проверьте файл или ссылку.'); });
+  if ('mediaSession' in navigator){ try { navigator.mediaSession.metadata = new MediaMetadata({ title:t.name, artist:SIDE_NAME[t.side] }); } catch(e){} }
+  renderMusic();
+}
+function musNext(dir = 1){
+  const list = musList(MUS.side); if (!list.length){ musNote('В плейлисте «' + SIDE_NAME[MUS.side] + '» пока нет треков.'); return; }
+  let i = list.findIndex(t => t.id === MUS.cur);
+  if (MUS.shuffle && list.length > 1){ let j; do j = Math.floor(Math.random()*list.length); while (j === i); i = j; }
+  else i = i < 0 ? 0 : (i + dir + list.length) % list.length;
+  musPlay(list[i]);
+}
+function musToggle(){
+  if (!MUS.cur || !musList(MUS.side).some(t => t.id === MUS.cur)){ musNext(0); return; }
+  if (MUS.audio.paused) MUS.audio.play().catch(() => {}); else MUS.audio.pause();
+  renderMusic();
+}
+function musSetSide(side){
+  MUS.side = side; MUS.tab = side;
+  const list = musList(side), curOk = list.some(t => t.id === MUS.cur);
+  if (MUS.auto && list.length && !(curOk && !MUS.audio.paused)) musPlay(MUS.shuffle ? list[Math.floor(Math.random()*list.length)] : list[0]);
+  else if (!curOk && MUS.cur && !MUS.audio.paused) MUS.audio.pause();
+  renderMusic();
+}
+MUS.audio.addEventListener('ended', () => musNext(1));
+MUS.audio.addEventListener('error', () => { if (MUS.cur) musNote('Трек не воспроизводится, переключаю на следующий.'); setTimeout(() => musNext(1), 400); });
+MUS.audio.addEventListener('play', () => renderMusic()); MUS.audio.addEventListener('pause', () => renderMusic());
+if ('mediaSession' in navigator){ try {
+  navigator.mediaSession.setActionHandler('nexttrack', () => musNext(1)); navigator.mediaSession.setActionHandler('previoustrack', () => musNext(-1));
+  navigator.mediaSession.setActionHandler('play', () => musToggle()); navigator.mediaSession.setActionHandler('pause', () => musToggle());
+} catch(e){} }
+function musNote(t){ const n = $('#mu-note'); if (n){ n.textContent = t; clearTimeout(musNote.tm); musNote.tm = setTimeout(() => n.textContent = '', 5000); } }
+function renderMusic(){
+  const cur = MUS.tracks.find(t => t.id === MUS.cur), playing = cur && !MUS.audio.paused;
+  const now = $('#mu-now'); if (now){ now.hidden = !cur; now.textContent = (playing ? '♪ ' : '❚❚ ') + (cur ? cur.name : ''); }
+  const bm = $('#b-music'); if (bm) bm.classList.toggle('on', !!playing);
+  const box = $('#mu-list'); if (!box) return;
+  document.querySelectorAll('#music .tabs button').forEach(b => b.classList.toggle('on', b.dataset.s === MUS.tab));
+  const list = musList(MUS.tab); box.innerHTML = '';
+  if (!list.length){ const p = document.createElement('p'); p.className = 'meta'; p.textContent = 'Плейлист пуст. Добавьте свои аудиофайлы или прямые ссылки на них.'; box.appendChild(p); }
+  list.forEach((t, i) => {
+    const row = document.createElement('div'); row.className = 'mu-row' + (t.id === MUS.cur ? ' cur' : '');
+    const nm = document.createElement('button'); nm.className = 'mu-name'; nm.textContent = (t.id === MUS.cur && playing ? '♪ ' : '') + t.name; nm.title = 'Включить';
+    nm.onclick = () => { MUS.side = t.side; musPlay(t); };
+    const up = document.createElement('button'); up.textContent = '↑'; up.title = 'Выше'; up.disabled = i === 0;
+    up.onclick = () => { const o = list[i-1].order; list[i-1].order = t.order; t.order = o; musPut(t); musPut(list[i-1]); MUS.tracks.sort((a, b) => a.order - b.order); renderMusic(); };
+    const del = document.createElement('button'); del.textContent = '×'; del.title = 'Убрать из плейлиста';
+    del.onclick = () => { if (t.id === MUS.cur){ MUS.audio.pause(); MUS.cur = null; } MUS.tracks = MUS.tracks.filter(x => x !== t); musDel(t.id); renderMusic(); };
+    row.append(nm, up, del); box.appendChild(row);
+  });
+  $('#mu-play').textContent = playing ? 'Пауза' : 'Играть';
+  $('#mu-shuf').classList.toggle('on', MUS.shuffle);
+  $('#mu-auto').checked = MUS.auto; $('#mu-vol').value = Math.round(MUS.vol*100);
+  $('#mu-side').textContent = 'Сейчас играет плейлист: ' + SIDE_NAME[MUS.side];
+  if (MUS.noDb) $('#mu-store').textContent = 'Браузер не даёт сохранить файлы: после перезагрузки их нужно будет добавить снова.';
+}
+function musAddFiles(files){
+  let o = Date.now();
+  for (const f of files){
+    if (!f.type.startsWith('audio/') && !/\.(mp3|ogg|wav|m4a|aac|flac|opus|webm)$/i.test(f.name)) continue;
+    const t = { id:'t' + o + Math.random().toString(36).slice(2, 6), side:MUS.tab, name:f.name.replace(/\.[^.]+$/, ''), blob:f, order:o++ };
+    MUS.tracks.push(t); musPut(t);
+  }
+  renderMusic();
+}
+function musAddUrl(u){
+  u = (u || '').trim(); if (!/^https?:\/\//i.test(u)){ musNote('Нужна ссылка, которая начинается с http:// или https://'); return; }
+  let name = decodeURIComponent(u.split('/').pop().split('?')[0] || 'Трек').replace(/\.[^.]+$/, '') || 'Трек';
+  const t = { id:'u' + Date.now(), side:MUS.tab, name, url:u, order:Date.now() }; MUS.tracks.push(t); musPut(t); renderMusic();
+}
+function openMusic(){ $('#music').hidden = !$('#music').hidden; if (!$('#music').hidden){ MUS.tab = MUS.side; renderMusic(); } }
+document.querySelectorAll('#music .tabs button').forEach(b => b.onclick = () => { MUS.tab = b.dataset.s; renderMusic(); });
+$('#mu-file').addEventListener('change', e => { musAddFiles(e.target.files); e.target.value = ''; });
+$('#mu-addurl').onclick = () => { musAddUrl($('#mu-url').value); $('#mu-url').value = ''; };
+$('#mu-url').addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') $('#mu-addurl').click(); });
+$('#mu-play').onclick = () => { if (MUS.tab !== MUS.side){ MUS.side = MUS.tab; MUS.cur = null; } musToggle(); };
+$('#mu-next').onclick = () => { MUS.side = MUS.tab; musNext(1); };
+$('#mu-prev').onclick = () => { MUS.side = MUS.tab; musNext(-1); };
+$('#mu-shuf').onclick = () => { MUS.shuffle = !MUS.shuffle; musSave(); renderMusic(); };
+$('#mu-auto').onchange = e => { MUS.auto = e.target.checked; musSave(); };
+$('#mu-vol').addEventListener('input', e => { MUS.vol = e.target.value/100; MUS.audio.volume = MUS.vol; musSave(); });
+$('#mu-close').onclick = () => { $('#music').hidden = true; };
+$('#b-music').onclick = openMusic; $('#m-music').onclick = openMusic; $('#mu-now').onclick = openMusic;
+musLoad();
 
 showScreen('main');
 setLogFilter('all');
