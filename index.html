@@ -110,6 +110,10 @@ input{font:inherit;font-size:28px;letter-spacing:.2em;text-transform:uppercase;w
 .card.eng{border-style:dashed}
 .opts{display:flex;gap:18px;flex-wrap:wrap;margin:6px 0 4px}
 .seg{display:flex;gap:0;margin-top:4px}.seg button{border-radius:0;padding:6px 10px}.seg button:first-child{border-radius:3px 0 0 3px}.seg button:last-child{border-radius:0 3px 3px 0}.seg button+button{border-left:0}
+#replay{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom));display:flex;gap:8px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:8px 10px;width:min(820px,calc(100vw - 20px))}
+#rp-seek{flex:1;width:auto;font-size:14px;letter-spacing:0;padding:0;accent-color:var(--brass)}
+#rp-time{min-width:96px;text-align:center;color:var(--brass)}
+body.replay #deck,body.replay #cmd,body.replay #hint,body.replay #sel,body.replay #chat-in{display:none!important}
 #toasts{position:fixed;top:110px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none}
 .toast{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--brass);padding:6px 12px;border-radius:3px;font-size:15px}
 .toast.bad{border-left-color:var(--bad)}
@@ -161,13 +165,15 @@ input{font:inherit;font-size:28px;letter-spacing:.2em;text-transform:uppercase;w
     <button id="b-smoke" hidden>Дым [G]</button>
     <button id="b-unload" hidden>Высадить [U]</button>
     <button id="b-afire" hidden>Огонь по точке [T]</button>
+    <button id="b-tunnel" hidden>Подвалами [B]</button>
   </div>
   <div id="toasts" aria-live="polite"></div>
 </div>
 
+<div id="replay" hidden><button id="rp-play">Пауза</button><button id="rp-speed">×2</button><input id="rp-seek" type="range" min="0" max="1000" value="0" aria-label="Время повтора"><span id="rp-time"></span><button id="rp-vis">Видно всё</button><button id="rp-exit">Выйти из повтора</button></div>
 <div id="round" hidden><div class="box"><div id="round-body"></div></div></div>
 <div id="end" hidden><div class="box"><div id="end-body"></div>
-  <div class="row"><button id="end-lobby" class="go">Вернуться в лобби</button><span id="end-wait" class="meta">Новый бой начнёт создатель лобби.</span><button id="end-map">Посмотреть карту</button><button id="end-menu">Главное меню</button></div></div></div>
+  <div class="row"><button id="end-lobby" class="go">Вернуться в лобби</button><span id="end-wait" class="meta">Новый бой начнёт создатель лобби.</span><button id="end-replay" class="go">Повтор боя</button><button id="end-map">Посмотреть карту</button><button id="end-menu">Главное меню</button></div></div></div>
 
 <div id="menu">
   <section class="screen" id="s-main">
@@ -232,6 +238,7 @@ input{font:inherit;font-size:28px;letter-spacing:.2em;text-transform:uppercase;w
         <dt>G</dt><dd>дым у выбранных: «Туча» у танков и БТР, РДГ-2 у пехоты</dd>
         <dt>E</dt><dd>осветительная ракета (ночью)</dd>
         <dt>T</dt><dd>огонь по точке: выбранные бьют по дому или месту, даже не видя противника</dd>
+        <dt>B</dt><dd>ВС ЧРИ: уйти подвалами в другой дом квартала</dd>
         <dt>Правая по БТР или БМП</dt><dd>посадить выбранную пехоту на броню; U — высадить</dd>
         <dt>1–9, 0</dt><dd>карточки колоды</dd>
         <dt>WASD, стрелки</dt><dd>двигать карту; колесо — масштаб; средняя кнопка или пробел с левой — перетаскивание</dd>
@@ -248,6 +255,9 @@ input{font:inherit;font-size:28px;letter-spacing:.2em;text-transform:uppercase;w
       <p>Бой может идти в два этапа. В первом один игрок атакует, другой обороняется, во втором вы меняетесь сторонами на той же карте: руины, воронки, остовы и павшие остаются. Побеждает тот, у кого больше очков за оба этапа.</p>
       <p>Ночью видимость примерно вдвое меньше, а каждый выстрел выдаёт стрелка вспышкой. Осветительная ракета снимает темноту в большом круге для обеих сторон. Зимой колёсная техника вязнет в снегу вне дорог, а гусеницы оставляют следы.</p>
       <p>Пехота ВС ЧРИ может вставать и выходить из подвалов любых жилых домов, если рядом нет противника: при расстановке дальше 250 м от его зоны, в бою дальше 220 м от его отрядов. Подходящие дома подсвечиваются. Во время боя щёлкните карточку пехоты и затем дом; второй щелчок по карточке вызывает отряд с края карты.</p>
+      <p>Подвалы и проходы. Бойцы ВС ЧРИ, стоящие в жилом доме, могут уйти подвалами (B) в любой дом того же квартала, если между домами не больше одного прохода. Под землёй отряд не виден и неуязвим, но и не стреляет; улицу так не пересечь. Руины тоже годятся: подвалы переживают обрушение.</p>
+      <p>Связь у федеральных сил. Приказы сразу получают отряды у штаба (зона расстановки и 300 м вокруг) и в радиусе 450 м от командно-штабной машины Р-145БМ. Остальные подписаны «нет связи», и приказ доходит до них за 6–10 секунд. Берегите КШМ: без неё штурмовые группы в глубине города действуют вслепую, как это часто бывало в январе 1995 года.</p>
+      <p>После боя можно посмотреть повтор: с перемоткой, ускорением и видом всей карты или только того, что видела ваша сторона.</p>
       <p>Бойцы на верхних этажах нарисованы на «срезе» над крышей. Пушка танка не поднимается на верхние этажи ближе 70 м: у выбранного танка эта зона обведена красным. Невидимого стрелка выдаёт вспышка; по его дому можно ударить огнём по точке (T). Подбитые машины остаются остовами, через которые техника не проедет, а пехота за ними укрывается.</p>
       <p>Мины и баррикады ставит только обороняющийся, в любом месте не ближе 200 м к зоне противника. Атакующие федералы получают сапёров. Баррикада перекрывает улицу технике и даёт укрытие пехоте. Мину противник не видит, пока её не найдут его сапёры или пехота рядом. Сапёры находят мины в радиусе 70 м, снимают их и разбирают баррикады, если остановить их рядом. Танк, наехавший на мину, обычно остаётся на месте с разбитой ходовой, но продолжает стрелять.</p>
       <p>Дым полностью перекрывает обзор, пока не рассеется. БТР-80, БМП-2 и БТР-70 везут по одному отделению. Десант внутри защищён от пуль и осколков, но при гибели машины выживает не весь.</p>
@@ -339,13 +349,17 @@ const UT = {
     w:['zu23'], desc:'Зенитная установка на грузовике. Сильна против пехоты и лёгкой техники, но гибнет от первого попадания.' },
   c_sup:{ side:'chr', name:'КамАЗ с боеприпасами', icon:'truck', cls:'veh', mc:'wheel', hp:40, speed:11, vision:200, cost:15, limit:3, armor:{f:3,s:3,r:3,t:3}, supply:true,
     w:[], desc:'Пополняет выстрелы к РПГ у групп в радиусе 90 м, пока стоит на месте.' },
+  f_t72b:{ side:'fed', name:'Т-72Б1', icon:'armor', cls:'veh', mc:'track', hp:155, speed:8.5, vision:250, cost:95, limit:6, armor:{f:520,s:90,r:55,t:40}, cookoff:true,
+    w:['d81','pkt'], desc:'Т-72Б1 с навесной динамической защитой «Контакт-1» на лобовом листе и башне, ящиками ЗИП на полках и бревном самовытаскивания на корме. Такие машины воевали в Чечне в 1995–1996 годах. ДЗ держит РПГ в лоб, но борт и крыша по-прежнему уязвимы, а боекомплект в карусели детонирует.' },
+  f_cmd:{ side:'fed', name:'КШМ Р-145БМ', icon:'hq', cls:'veh', mc:'wheel', hp:90, speed:10, vision:260, cost:30, limit:2, armor:{f:10,s:7,r:7,t:6}, comm:450,
+    w:[], desc:'Командно-штабная машина на шасси БТР-60 с радиостанциями. Подразделения в радиусе 450 м от неё или рядом со штабом (зоной расстановки) получают приказы сразу, остальные — с задержкой через посыльных и ретрансляцию.' },
   f_sap:{ side:'fed', name:'Инженерно-сапёрное отделение', icon:'eng', cls:'inf', mc:'foot', men:6, hp:60, speed:4, vision:320, acc:.9, cost:30, limit:3, sapper:true,
     w:['ak',['rpg26',{ammo:1}]], desc:'Находит мины в радиусе 70 м, снимает их и разбирает баррикады. Остановите сапёров рядом с целью, дальше они работают сами.' },
   c_sap:{ side:'chr', name:'Сапёры', icon:'eng', cls:'inf', mc:'foot', men:4, hp:40, speed:4.2, vision:320, acc:.9, cost:25, limit:3, sapper:true,
     w:['akm',['rpg7',{ammo:2}]], desc:'Находят мины в радиусе 70 м, снимают их и разбирают баррикады противника.' }
 };
 const TK = Object.keys(UT); const TI = {}; TK.forEach((k, i) => TI[k] = i);
-const SMOKE_CH = { f_t72:2, f_t80:2, c_t72:2, f_bmp:1, f_btr:1, c_btr:1 };
+const SMOKE_CH = { f_t72:2, f_t72b:2, f_t80:2, c_t72:2, f_bmp:1, f_btr:1, c_btr:1 };
 const CAP = { f_btr:1, f_bmp:1, c_btr:1 };
 for (const k of TK){
   const d = UT[k]; d.key = k;
@@ -403,7 +417,7 @@ const SCEN = {
     goals:{ fed:'Возьмите пехотой вокзал, дворец, Совмин и площадь Минутка. Техника без пехоты в городе слепа и уязвима.',
             chr:'Удержите ключевые здания. Бейте по бортам и крышам машин с верхних этажей и меняйте позиции после выстрела.' },
     start:{ fed:{points:600, income:1.2}, chr:{points:520, income:1.0} },
-    decks:{ fed:['f_msv','f_sap','f_vdv','f_rec','f_snp','f_btr','f_bmp','f_t72','f_t80','f_zsu','f_ural'],
+    decks:{ fed:['f_msv','f_sap','f_vdv','f_rec','f_snp','f_cmd','f_btr','f_bmp','f_t72','f_t80','f_zsu','f_ural'],
             chr:['c_opl','c_rpg','c_vet','c_snp','c_pk','c_t72','c_btr','c_zu','c_sup'] },
     deploy:{ fed:[{x:0,y:0,w:2400,h:170},{x:0,y:170,w:120,h:900}], chr:[{x:420,y:360,w:1700,h:1200}] },
     entry:{ fed:[{x:500,y:30},{x:1200,y:30},{x:1900,y:30},{x:30,y:700}], chr:[{x:1200,y:1570},{x:2370,y:1000}] },
@@ -418,7 +432,7 @@ const SCEN = {
     goals:{ fed:'Удержите блокпосты до подхода подкреплений со стороны Ханкалы, с восточного края карты.',
             chr:'Проникните в город, отрежьте и возьмите блокпосты. Тяжёлой техники нет: действуйте группами и избегайте открытых улиц.' },
     start:{ fed:{points:380, income:.8}, chr:{points:660, income:1.25} },
-    decks:{ fed:['f_msv','f_sap','f_vdv','f_snp','f_btr','f_bmp','f_t72','f_zsu','f_ural'],
+    decks:{ fed:['f_msv','f_sap','f_vdv','f_snp','f_cmd','f_btr','f_bmp','f_t72b','f_zsu','f_ural'],
             chr:['c_opl','c_rpg','c_vet','c_snp','c_pk','c_zu','c_sup'] },
     deploy:{ fed:[{x:100,y:160,w:260,h:260},{x:530,y:270,w:260,h:260},{x:1070,y:670,w:260,h:260},{x:1670,y:1150,w:260,h:260}],
              chr:[{x:0,y:1520,w:2400,h:80},{x:0,y:600,w:100,h:800}] },
@@ -434,7 +448,7 @@ const SCEN = {
     goals:{ fed:'Проведите грузовики колонны к восточному краю карты. Занимайте высоты, чтобы прикрыть дорогу.',
             chr:'Остановите колонну. Каждый уничтоженный грузовик приносит очки, высоты дают обзор на дорогу.' },
     start:{ fed:{points:280, income:.7}, chr:{points:340, income:.6} },
-    decks:{ fed:['f_msv','f_sap','f_rec','f_snp','f_btr','f_bmp','f_t72','f_zsu'],
+    decks:{ fed:['f_msv','f_sap','f_rec','f_snp','f_cmd','f_btr','f_bmp','f_t72b','f_zsu'],
             chr:['c_opl','c_rpg','c_vet','c_snp','c_pk','c_zu','c_sup'] },
     deploy:{ fed:[{x:0,y:600,w:440,h:480}], chr:[{x:700,y:160,w:1400,h:460},{x:900,y:1160,w:1100,h:300}] },
     entry:{ fed:[{x:30,y:880}], chr:[{x:1000,y:30},{x:1700,y:30}] },
@@ -632,7 +646,7 @@ function makeGame(scnId, seed, opts){
   const g = { scn:scnId, sc, seed, map, t:0, phase:'deploy', phaseT:sc.deployTime, units:[], byId:new Map(), nextId:1,
     sides:{ fed:mkSide(sc.start.fed), chr:mkSide(sc.start.chr) },
     objs: sc.objectives.map(o => ({ ...o, prog: o.owner === 'fed' ? 100 : o.owner === 'chr' ? -100 : 0 })),
-    ev:[], shells:[], artyMarks:[], arrivals:[], bldHits:0, bldDown:0, civs:[], noise:[], civDead:0, civEvac:0, result:null, visT:0, entry:JSON.parse(JSON.stringify(sc.entry)),
+    ev:[], shells:[], artyMarks:[], arrivals:[], bldHits:0, bldDown:0, civs:[], noise:[], civDead:0, civEvac:0, result:null, visT:0, delayed:[], entry:JSON.parse(JSON.stringify(sc.entry)),
     rounds:opts.rounds === 2 ? 2 : 1, round:1, tod:opts.tod || 'day', winter:!!sc.winter, mines:[], smokes:[], flares:[], rr:[], mineId:1, engT:0 };
   g.night = g.tod === 'night';
   spawnConvoy(g);
@@ -687,8 +701,44 @@ function formationMove(g, us, x, y, fast){
   });
 }
 
+const COMM_ZONE = 300, COMM_CMDS = new Set(['move', 'attack', 'afire', 'smoke', 'unload', 'stop', 'board']);
+function hasComm(g, u){
+  if (u.side !== 'fed' || UT[u.type].comm) return true;
+  if (zoneDist(g, 'fed', u.x, u.y) <= COMM_ZONE) return true;
+  return g.units.some(k => !k.dead && !k.carrier && k.side === 'fed' && UT[k.type].comm && Math.hypot(k.x - u.x, k.y - u.y) <= UT[k.type].comm);
+}
+// подвалы: жилые дома (и их руины) одного квартала, между которыми не больше одной клетки прохода
+const isCellar = (m, i) => m.res[i] && (m.t[i] === T.BLD || m.t[i] === T.RUBBLE);
+function cellarReach(m, from, limit = 900){
+  const W = m.W, H = m.H, prev = new Map([[from, -1]]), q = [from];
+  for (let h = 0; h < q.length && q.length < limit; h++){
+    const i = q[h], x = i % W, y = Math.floor(i/W);
+    for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++){
+      if (!dx && !dy) continue; const X = x+dx, Y = y+dy; if (X < 0 || Y < 0 || X >= W || Y >= H) continue;
+      const j = Y*W + X; if (prev.has(j) || !isCellar(m, j)) continue; prev.set(j, i); q.push(j);
+    }
+  }
+  return prev;
+}
+function cellarPath(m, from, to){
+  if (!isCellar(m, from) || !isCellar(m, to)) return null;
+  const prev = cellarReach(m, from); if (!prev.has(to)) return null;
+  const out = []; for (let i = to; i !== -1; i = prev.get(i)) out.push(cellCenter(m, i));
+  return out.reverse();
+}
 function applyCommand(g, side, c){
   if (!c || g.phase === 'end') return;
+  if (side === 'fed' && g.phase === 'battle' && !c._d && COMM_CMDS.has(c.c) && c.ids){
+    const us = ownUnits(g, side, c.ids, true), out = us.filter(u => !hasComm(g, u));
+    if (out.length){
+      const outIds = new Set(out.map(u => u.id)), delay = 6 + Math.random()*4;
+      g.delayed.push({ t:g.t + delay, c:{ ...c, ids:[...outIds], _d:true } });
+      for (const u of out) u.pend = g.t + delay;
+      g.ev.push({ e:'delay', n:out.length, s:Math.round(delay) });
+      c = { ...c, ids:c.ids.filter(id => !outIds.has(id)) };
+      if (!c.ids.length) return;
+    }
+  }
   const S = g.sides[side];
   switch (c.c){
     case 'deploy': {
@@ -797,6 +847,17 @@ function applyCommand(g, side, c){
       return;
     }
     case 'stop': for (const u of ownUnits(g, side, c.ids)){ u.path = null; u.dest = null; u.focus = 0; u.fast = false; u.board = 0; u.afire = null; } return;
+    case 'tunnel': {
+      if (g.phase !== 'battle' || side !== 'chr') return;
+      const m = g.map, to = cellIdx(m, c.x, c.y);
+      for (const u of ownUnits(g, side, c.ids)){
+        if (UT[u.type].cls !== 'inf' || u.under) continue;
+        const p = cellarPath(m, cellIdx(m, u.x, u.y), to); if (!p || p.length < 2) continue;
+        u.under = true; u.upath = p.slice(1); u.path = null; u.dest = p[p.length - 1]; u.focus = 0; u.afire = null; u.supp = 0;
+        g.ev.push({ e:'dive', side, id:u.id });
+      }
+      return;
+    }
     case 'ability': {
       if (g.phase !== 'battle') return; const A = AB[side];
       if (S.cd > 0 || S.pts < A.cost) return;
@@ -839,9 +900,9 @@ function updateVis(g){
   const us = g.units;
   for (const u of us){ u.vis.fed = u.side === 'fed'; u.vis.chr = u.side === 'chr'; u._c = []; }
   for (let i = 0; i < us.length; i++){
-    const a = us[i]; if (a.dead || a.carrier) continue; const da = UT[a.type];
+    const a = us[i]; if (a.dead || a.carrier || a.under) continue; const da = UT[a.type];
     for (let j = i+1; j < us.length; j++){
-      const b = us[j]; if (b.dead || b.carrier || b.side === a.side) continue; const db = UT[b.type];
+      const b = us[j]; if (b.dead || b.carrier || b.under || b.side === a.side) continue; const db = UT[b.type];
       const d = Math.hypot(b.x-a.x, b.y-a.y);
       const ra = Math.max(da.vision*1.5, da.maxRange), rb = Math.max(db.vision*1.5, db.maxRange);
       if (d > ra && d > rb) continue;
@@ -901,7 +962,7 @@ function damage(g, b, dmg){
 }
 function splash(g, x, y, r, dmg, pen, exclude, side){
   for (const u of g.units){
-    if (u.dead || u.carrier || u.id === exclude) continue;
+    if (u.dead || u.carrier || u.under || u.id === exclude) continue;
     const d = Math.hypot(u.x-x, u.y-y); if (d > r*2) continue;
     const du = UT[u.type];
     u.supp = Math.min(120, u.supp + (du.cls === 'veh' ? 8 : 30)*(1 - d/(r*2))); u.hitT = g.t;
@@ -1039,6 +1100,13 @@ function updateUnit(g, u, dt){
   const tr = terrAt(g.map, u.x, u.y); u.inB = tr === T.BLD;
   if (u.immob && u.path){ u.path = null; u.dest = null; }
   // посадка на броню
+  if (u.under){
+    const p = u.upath[0];
+    if (!p){ u.under = false; u.dest = null; g.ev.push({ e:'emerge', side:u.side, id:u.id, x:Math.round(u.x), y:Math.round(u.y) }); return; }
+    const dx = p.x - u.x, dy = p.y - u.y, dd = Math.hypot(dx, dy), st = GAME_SPEED*2.6*dt;
+    if (st >= dd){ u.x = p.x; u.y = p.y; u.upath.shift(); } else { u.x += dx/dd*st; u.y += dy/dd*st; }
+    u.moving = true; return;
+  }
   if (u.board){
     const v = g.byId.get(u.board);
     if (!v || v.dead || v.cargo || v.side !== u.side) u.board = 0;
@@ -1090,7 +1158,7 @@ function startRound2(g){
   g.units = []; g.byId.clear();
   g.sides = { fed:mkSide(sc.start.fed), chr:mkSide(sc.start.chr) };
   g.objs = sc.objectives.map(o => ({ ...o, prog: o.owner === 'fed' ? 100 : o.owner === 'chr' ? -100 : 0 }));
-  g.shells = []; g.artyMarks = []; g.arrivals = []; g.mines = []; g.smokes = []; g.flares = [];
+  g.shells = []; g.artyMarks = []; g.arrivals = []; g.mines = []; g.smokes = []; g.flares = []; g.delayed = [];
   for (const c of g.civs) if (!c.dead && c.st !== 3){ c.st = 0; c.path = null; }
   g.night = g.tod === 'night' || g.tod === 'daynight';
   spawnConvoy(g);
@@ -1131,9 +1199,14 @@ function step(g, dt){
     if (!v.dead && d.mc === 'track'){ v.immob = true; v.path = null; v.dest = null; }
     else if (!v.dead){ v.immob = true; }
   }
+  if (g.delayed.length){
+    const due = g.delayed.filter(d => d.t <= g.t); g.delayed = g.delayed.filter(d => d.t > g.t);
+    for (const d of due){ for (const id of d.c.ids){ const u = g.byId.get(id); if (u && u.pend && u.pend <= g.t + .01) u.pend = 0; } applyCommand(g, 'fed', d.c); }
+  }
   g.engT -= dt;
   if (g.engT <= 0){
     g.engT = .5;
+    for (const u of g.units) if (u.side === 'fed' && !u.dead) u.nocomm = !hasComm(g, u);
     for (const mn of g.mines){
       const es = other(mn.side); if (mn.rev[es]) continue;
       for (const u of g.units){
@@ -1191,7 +1264,7 @@ function step(g, dt){
   for (const o of g.objs){
     let f = 0, c = 0;
     for (const u of g.units){
-      if (u.dead || u.carrier || UT[u.type].cls !== 'inf' || u.supp >= 70) continue;
+      if (u.dead || u.carrier || u.under || UT[u.type].cls !== 'inf' || u.supp >= 70) continue;
       if ((u.x-o.x)**2 + (u.y-o.y)**2 > o.r*o.r) continue;
       if (u.side === 'fed') f++; else c++;
     }
@@ -1355,6 +1428,14 @@ function aiStep(g, side, dt, st){
   }
   if (g.night && S.cd3 <= 0 && S.pts > 30){ const o = g.objs[Math.floor(Math.random()*g.objs.length)]; applyCommand(g, side, { c:'flare', x:o.x + gauss()*80, y:o.y + gauss()*80 }); }
   const mine = g.units.filter(u => u.side === side && !u.carrier), inf = mine.filter(u => UT[u.type].cls === 'inf');
+  if (side === 'chr') for (const u of inf){
+    if (u.under || !u.inB || u.supp < 45 || Math.random() > .35) continue;
+    const reach = cellarReach(g.map, cellIdx(g.map, u.x, u.y)); if (reach.size < 4) continue;
+    const en = g.units.filter(e => e.side !== side && e.vis[side]); if (!en.length) continue;
+    let best = null, bs = -1;
+    for (const ci of reach.keys()){ const p = cellCenter(g.map, ci); const d = Math.min(...en.map(e => Math.hypot(e.x - p.x, e.y - p.y))); if (d > bs){ bs = d; best = p; } }
+    if (best) applyCommand(g, side, { c:'tunnel', ids:[u.id], x:best.x, y:best.y });
+  }
   for (const u of mine){
     const d = UT[u.type];
     if (d.convoy){ if (!u.path && g.sc.exit){ const e = g.sc.exit; applyCommand(g, side, { c:'move', ids:[u.id], x:e.x + e.w/2, y:u.y }); } continue; }
@@ -1391,7 +1472,7 @@ function encodeSnap(g, ev){
     o:g.objs.map(o => [Math.round(o.prog), o.owner || 0]),
     u:g.units.map(u => [u.id, TI[u.type], u.side === 'fed' ? 0 : 1, Math.round(u.x), Math.round(u.y), Math.round(u.h*100), Math.round(u.hp), Math.round(u.supp),
       (u.vis.fed?1:0)|(u.vis.chr?2:0)|(u.inB?4:0)|(u.moving?8:0)|(u.fast?16:0)|((g.t-u.fired < .4)?32:0)|(u.focus?64:0),
-      u.dest ? Math.round(u.dest.x) : -1, u.dest ? Math.round(u.dest.y) : -1, u.w.map(w => isFinite(w.ammo) ? w.ammo : -1), Math.round(u.ta*100), u.carrier, u.smk, (u.immob?1:0)|(u.workT?2:0)|(u.board?4:0)|(u.workT && u.workT.k === 'mine'?8:0), u.afire ? Math.round(u.afire.x) : -1, u.afire ? Math.round(u.afire.y) : -1]),
+      u.dest ? Math.round(u.dest.x) : -1, u.dest ? Math.round(u.dest.y) : -1, u.w.map(w => isFinite(w.ammo) ? w.ammo : -1), Math.round(u.ta*100), u.carrier, u.smk, (u.immob?1:0)|(u.workT?2:0)|(u.board?4:0)|(u.workT && u.workT.k === 'mine'?8:0), u.afire ? Math.round(u.afire.x) : -1, u.afire ? Math.round(u.afire.y) : -1, (u.nocomm?1:0)|(u.under?2:0), u.pend ? Math.max(1, Math.ceil(u.pend - g.t)) : 0]),
     mn:g.mines.map(m => [m.id, Math.round(m.x), Math.round(m.y), m.side === 'fed' ? 0 : 1, (m.rev.fed?1:0)|(m.rev.chr?2:0)]),
     sm:g.smokes.map(s => [Math.round(s.x), Math.round(s.y), Math.round(smokeR(g, s)), Math.round(s.until - g.t)]),
     fl:g.flares.map(f => [Math.round(f.x), Math.round(f.y), Math.round((f.until - g.t)*10)/10]),
@@ -1407,10 +1488,10 @@ function decodeSnap(s){
     civs:s.cv.map(a => ({ x:a[0], y:a[1], st:a[2], h:a[3]/10, mv:!!a[4], id:a[5] })),
     units:s.u.map(a => ({ id:a[0], type:TK[a[1]], side:a[2] ? 'chr' : 'fed', x:a[3], y:a[4], h:a[5]/100, hp:a[6], supp:a[7],
       vis:{ fed:!!(a[8]&1), chr:!!(a[8]&2) }, inB:!!(a[8]&4), moving:!!(a[8]&8), fast:!!(a[8]&16), fired:!!(a[8]&32), focus:!!(a[8]&64),
-      dest:a[9] >= 0 ? { x:a[9], y:a[10] } : null, ammo:a[11], ta:a[12]/100, carrier:a[13], smk:a[14], immob:!!(a[15]&1), working:(a[15]&2) ? ((a[15]&8) ? 'mine' : 'barr') : null, boarding:!!(a[15]&4), afire:a[16] >= 0 ? { x:a[16], y:a[17] } : null })) };
+      dest:a[9] >= 0 ? { x:a[9], y:a[10] } : null, ammo:a[11], ta:a[12]/100, carrier:a[13], smk:a[14], immob:!!(a[15]&1), working:(a[15]&2) ? ((a[15]&8) ? 'mine' : 'barr') : null, boarding:!!(a[15]&4), afire:a[16] >= 0 ? { x:a[16], y:a[17] } : null, nocomm:!!(a[18]&1), under:!!(a[18]&2), pend:a[19] || 0 })) };
 }
 
-if (typeof module !== 'undefined') module.exports = { UT, SCEN, AB, AB2, ENG, T, CELL, TK, spawnUnit, infilOk, engOk, makeGame, step, applyCommand, aiStep, encodeSnap, decodeSnap, findPath, buildMap, los };
+if (typeof module !== 'undefined') module.exports = { cellarPath, cellarReach, hasComm, UT, SCEN, AB, AB2, ENG, T, CELL, TK, spawnUnit, infilOk, engOk, makeGame, step, applyCommand, aiStep, encodeSnap, decodeSnap, findPath, buildMap, los };
 
 </script>
 <script>
@@ -1509,30 +1590,59 @@ function addDecal(c, d){ c.decals.push(d); if (c.decals.length > 4000) c.decals.
 /* ---------- Объёмные модели (стопка вокселей) ---------- */
 const VX = 4; // пикселей на воксель в заготовке
 const PAL = {
-  fed:  { hull:'#5a6440', light:'#737e52', dark:'#3e4530', track:'#2a2926', metal:'#4d5047', glass:'#9fb4b8', tent:'#6a6d4a', era:'#7d865a', wheel:'#232220', stripe:'#ecebe2' },
-  chr:  { hull:'#4d5536', light:'#646b46', dark:'#353a28', track:'#2a2926', metal:'#4d5047', glass:'#9fb4b8', tent:'#5a573e', era:'#6f784e', wheel:'#232220', stripe:'#646b46' },
-  burnt:{ hull:'#2d2926', light:'#3b332d', dark:'#1d1a18', track:'#181715', metal:'#42352b', glass:'#161616', tent:'#221e1a', era:'#322b25', wheel:'#141312', stripe:'#2e2925' }
+  fed:  { hull:'#5a6440', light:'#737e52', dark:'#3e4530', track:'#2a2926', metal:'#4d5047', glass:'#9fb4b8', tent:'#6a6d4a', era:'#8d9563', wheel:'#232220', stripe:'#ecebe2', wood:'#8d7a52', box:'#727a52' },
+  chr:  { hull:'#4d5536', light:'#646b46', dark:'#353a28', track:'#2a2926', metal:'#4d5047', glass:'#9fb4b8', tent:'#5a573e', era:'#7a8455', wheel:'#232220', stripe:'#646b46', wood:'#8d7a52', box:'#636a47' },
+  burnt:{ hull:'#2d2926', light:'#3b332d', dark:'#1d1a18', track:'#181715', metal:'#42352b', glass:'#161616', tent:'#221e1a', era:'#322b25', wheel:'#141312', stripe:'#2e2925', wood:'#2a2420', box:'#2c2622' }
 };
 const tracks = (L, w, t, h) => [[-L, L, -w, -w+t, 0, h, 'track'], [-L, L, w-t, w, 0, h, 'track']];
 const wheels = (xs, w, h) => xs.flatMap(x => [[x-1.2, x+1.2, -w, -w+1.2, 0, h, 'wheel'], [x-1.2, x+1.2, w-1.2, w, 0, h, 'wheel']]);
 const truckBody = tent => [ ...wheels([-6, -3, 5], 3.3, 1.8), [-8, 8, -2.2, 2.2, .8, 1.6, 'dark'],
   [4, 8, -3, 3, 1.6, 4, 'hull'], [7.2, 8, -2.6, 2.6, 2.8, 3.6, 'glass'], [4, 7.4, -2.8, 2.8, 4, 4.5, 'light'],
   [-8, 3.6, -3.2, 3.2, 1.6, 2.5, 'hull'], ...(tent ? [[-8, 3.4, -3.1, 3.1, 2.5, 4.3, 'tent'], [-8, 3.4, -.4, .4, 4.3, 4.5, 'dark']] : [[-8, 3.6, -3.2, -2.6, 2.5, 3.2, 'dark'], [-8, 3.6, 2.6, 3.2, 2.5, 3.2, 'dark']]) ];
+
+// Т-72 по фото: низкий корпус с длинными ящиками ЗИП на полках, круглая литая башня по центру,
+// ящик на корме башни, дымовые гранатомёты, бревно самовытаскивания поперёк кормы; у Б1 — «Контакт-1»
+function t72Model(b1){
+  const hull = [ ...tracks(9, 4.5, 1.2, 1.8), [-8.6, 8.6, -3.3, 3.3, 0, 2, 'dark'],
+    [-9, 9, -4.4, 4.4, 1.8, 2.6, 'hull'],
+    // ящики ЗИП вдоль обоих бортов
+    ...[[-7.6, -3.4], [-3.2, 1.2], [1.4, 5.2]].flatMap(([a, b]) => [[a, b, -4.4, -3.3, 2.6, 3.3, 'box'], [a, b, 3.3, 4.4, 2.6, 3.3, 'box'],
+      [a + .5, a + .9, -4.45, -4.2, 3.3, 3.45, 'dark'], [b - .9, b - .5, 4.2, 4.45, 3.3, 3.45, 'dark']]),
+    // моторное отделение: крышка, жалюзи
+    [-8.8, -3.3, -3.1, 3.1, 2.6, 3, 'dark'], [-8.2, -4.2, -2.6, -.4, 3, 3.2, 'metal'], [-8.2, -4.2, .4, 2.6, 3, 3.2, 'metal'],
+    [-3.2, -1.2, -3, 3, 2.6, 2.9, 'hull'],
+    // бревно поперёк кормы
+    [-9.9, -9, -4.6, 4.6, 2.3, 3.2, 'wood', 'e'],
+    [8.3, 9, -3.6, -2.9, 2.6, 3, 'glass'], [8.3, 9, 2.9, 3.6, 2.6, 3, 'glass'] ];
+  if (b1){
+    // кирпичи динамической защиты на лобовом листе, в шахматном порядке
+    for (let r = 0; r < 4; r++){ const x0 = 5 + r*1.0, off = (r % 2)*.8;
+      for (let c = -3.7 + off; c < 3.5; c += 1.55) hull.push([x0, x0 + .85, c, Math.min(c + 1.35, 3.7), 2.6, 3.2, 'era']); }
+  } else {
+    hull.push([5.2, 9, -3.6, 3.6, 1.8, 2.6, 'light'], [6.2, 6.8, -3.2, 3.2, 2.6, 3.1, 'dark']);
+    hull.push([-9.6, -8.3, -3.2, -.4, 2.6, 3.6, 'metal', 'e'], [-9.6, -8.3, .4, 3.2, 2.6, 3.6, 'metal', 'e']);
+  }
+  const tur = [ [-5.4, -3.2, -3, 2.2, .2, 1.8, 'box'], [-5.2, -3.4, -2.8, 2, 1.8, 2, 'dark'],
+    [-3.7, 3.7, -3.6, 3.6, 0, 1, 'hull', 'e'], [-3.5, 3.5, -3.35, 3.35, 1, 1.8, 'hull', 'e'], [-2.9, 2.9, -2.8, 2.8, 1.8, 2.4, 'light', 'e'] ];
+  if (b1){
+    // блоки «Контакт-1» подковой по лбу и сверху башни
+    for (let k = -5; k <= 5; k++){ const a = k*.3, cx = Math.cos(a)*3.05, cy = Math.sin(a)*3.05;
+      tur.push([cx - .6, cx + .6, cy - .55, cy + .55, .4, 2, 'era']); }
+    for (let k = -4; k <= 4; k++){ if (!k) continue; const a = k*.34, c2x = Math.cos(a)*1.9 + .2, c2y = Math.sin(a)*1.9; tur.push([c2x - .55, c2x + .55, c2y - .5, c2y + .5, 2.4, 2.8, 'era']); }
+  } else tur.push([2, 3.2, .9, 1.9, .9, 1.8, 'metal']);
+  tur.push([-.45, .45, -2.6, 2.6, 1.7, 2.4, 'stripe'],
+    [-2.3, -.3, .6, 2.6, 2.4, 3.1, 'dark', 'e'], [-1.6, 1.8, 1.45, 1.75, 3.1, 3.4, 'metal'],
+    [-1.6, 0, -2.3, -.7, 2.4, 2.8, 'dark', 'e'],
+    // дымовые гранатомёты «Туча»
+    [-1.4, .2, -4.1, -3.2, .8, 1.5, 'dark'], [-1.2, -.6, -4, -3.4, 1.5, 1.9, 'metal', 'e'], [-.5, .1, -4, -3.4, 1.5, 1.9, 'metal', 'e'],
+    // шноркель на корме башни справа
+    [-4.6, -1.6, 3.2, 3.8, .8, 1.3, 'metal'],
+    [3.3, 15.8, -.4, .4, .9, 1.6, 'metal'], [6.8, 7.2, -.52, .52, .9, 1.6, 'dark'], [9.8, 11, -.6, .6, .9, 1.6, 'dark']);
+  return { hull, tx:.2, tz:2.6, barrel:15.8, turret:tur };
+}
 const MODEL_DEF = {
-  // Т-72А: низкий корпус, литая башня-«купол» ближе к центру, длинный вынос пушки, бочки на корме, резиновые экраны
-  tank:{ hull:[ ...tracks(9, 4.5, 1.3, 1.8), [-8.6, 8.6, -3.2, 3.2, 0, 2, 'dark'],
-      [-9, 9, -4.5, 4.5, 1.8, 2.6, 'hull'], [-1, 9, -4.65, -4.25, 1.1, 2.6, 'dark'], [-1, 9, 4.25, 4.65, 1.1, 2.6, 'dark'],
-      [5.2, 9, -3.6, 3.6, 1.8, 2.6, 'light'], [6.2, 6.8, -3.2, 3.2, 2.6, 3.1, 'dark'],
-      [8.3, 9, -3.5, -2.8, 2.6, 3, 'glass'], [8.3, 9, 2.8, 3.5, 2.6, 3, 'glass'],
-      [-9, -3.2, -3.1, 3.1, 2.6, 3.1, 'dark'], [-8.4, -4, -2.3, -1.7, 3.1, 3.3, 'metal'], [-8.4, -4, 1.7, 2.3, 3.1, 3.3, 'metal'],
-      [-9.6, -8.3, -3.3, -.3, 2.4, 3.6, 'metal', 'e'], [-9.6, -8.3, .3, 3.3, 2.4, 3.6, 'metal', 'e'],
-      [-3, 5, -4.4, -3.4, 2.6, 3, 'metal'] ],
-    tx:.8, tz:2.6, barrel:15.2, turret:[ [-4.2, -3, -2.2, 2.2, .3, 1.4, 'dark'],
-      [-3.1, 3.1, -2.85, 2.85, 0, 1, 'hull', 'e'], [-2.9, 2.9, -2.6, 2.6, 1, 1.8, 'hull', 'e'], [-2.4, 2.4, -2.1, 2.1, 1.8, 2.4, 'light', 'e'],
-      [-.45, .45, -2.6, 2.6, 1.6, 2.4, 'stripe'],
-      [-1.9, -.1, .3, 2.1, 2.4, 3.1, 'dark', 'e'], [-1.4, .1, -1.9, -.5, 2.4, 2.75, 'dark', 'e'], [-1, 1.6, 1.05, 1.35, 3.1, 3.4, 'metal'],
-      [2, 3.2, .9, 1.9, .9, 1.8, 'metal'],
-      [2.6, 15.2, -.38, .38, .9, 1.6, 'metal'], [8.6, 9.9, -.58, .58, .9, 1.6, 'dark'] ] },
+  tank:t72Model(false),
+  tank72b:t72Model(true),
   // Т-80БВ: та же литая башня, но с «подковой» блоков динамической защиты и блоками на лобовом листе, корма с решёткой ГТД
   tank80:{ hull:[ ...tracks(9.5, 4.5, 1.3, 1.8), [-9, 9, -3.2, 3.2, 0, 2, 'dark'],
       [-9.5, 9.5, -4.5, 4.5, 1.8, 2.6, 'hull'], [-1, 9.5, -4.65, -4.25, 1.1, 2.6, 'dark'], [-1, 9.5, 4.25, 4.65, 1.1, 2.6, 'dark'],
@@ -1562,7 +1672,7 @@ const MODEL_DEF = {
   tech:{ hull:truckBody(false), tx:-3, tz:2.5, barrel:7, turret:[ [-1.6, 1.6, -1.6, 1.6, 0, .9, 'metal'], [-1.6, -.6, -.6, .6, .9, 2.2, 'dark'],
       [1, 7, -.9, -.45, .6, 1.1, 'metal'], [1, 7, .45, .9, .6, 1.1, 'metal'], [.2, 1.6, -1.2, 1.2, .6, 1.6, 'dark'] ] }
 };
-const MODEL_OF = { f_btr:'apc', f_bmp:'ifv', f_t72:'tank', f_t80:'tank80', f_zsu:'aa', f_ural:'truck', f_conv:'truck', c_t72:'tank', c_btr:'apc', c_zu:'tech', c_sup:'truck' };
+const MODEL_OF = { f_t72b:'tank72b', f_cmd:'apc', f_btr:'apc', f_bmp:'ifv', f_t72:'tank', f_t80:'tank80', f_zsu:'aa', f_ural:'truck', f_conv:'truck', c_t72:'tank', c_btr:'apc', c_zu:'tech', c_sup:'truck' };
 function shade(hex, f){ const n = parseInt(hex.slice(1), 16); const r = clamp(Math.round((n >> 16)*f), 0, 255), g = clamp(Math.round(((n >> 8) & 255)*f), 0, 255), b = clamp(Math.round((n & 255)*f), 0, 255); return `rgb(${r},${g},${b})`; }
 function buildStack(boxes, pal){
   let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity, z1 = 0;
@@ -1696,6 +1806,7 @@ function drawIcon(c, x, y, s, d, own, alpha, selected){
     case 'apc': E(.8); c.moveTo(-iw*.3 + 2, ih*.8); c.arc(-iw*.3, ih*.8, 1.5, 0, 7); c.moveTo(iw*.3 + 2, ih*.8); c.arc(iw*.3, ih*.8, 1.5, 0, 7); break;
     case 'aa': c.moveTo(-iw, ih); c.quadraticCurveTo(0, -ih*.8, iw, ih); break;
     case 'eng': c.moveTo(-iw*.75, ih*.45); c.lineTo(-iw*.75, -ih*.35); c.lineTo(iw*.75, -ih*.35); c.lineTo(iw*.75, ih*.45); c.moveTo(0, -ih*.35); c.lineTo(0, ih*.45); break;
+    case 'hq': c.moveTo(-w/2, h/2); c.lineTo(-w/2, h*1.3); c.moveTo(-iw*.8, -ih*.1); c.lineTo(iw*.8, -ih*.1); c.moveTo(-iw*.8, ih*.3); c.lineTo(iw*.8, ih*.3); break;
     case 'truck': c.moveTo(-iw, 0); c.lineTo(iw, 0); c.moveTo(-iw*.4 + 2, ih*.6); c.arc(-iw*.4, ih*.6, 2, 0, 7); c.moveTo(iw*.4 + 2, ih*.6); c.arc(iw*.4, ih*.6, 2, 0, 7); break;
   }
   c.stroke();
@@ -1833,9 +1944,9 @@ function updateEngines(list){
     const f = (wheel ? 42 : 31)*(u.moving ? 1.75 : 1)*(1 + v.jit);
     v.o1.frequency.setTargetAtTime(f, t, .35); v.o2.frequency.setTargetAtTime(f*1.5, t, .35);
     v.lp.frequency.setTargetAtTime(u.moving ? 460 : 230, t, .35);
-    v.whg.gain.setTargetAtTime(turb ? (u.moving ? .035 : .02) : 0, t, .3); v.wh.frequency.setTargetAtTime(turb ? (u.moving ? 1350 : 950) : 120, t, .5);
-    v.lfog.gain.setTargetAtTime(tr && u.moving ? .12 : 0, t, .2); v.lfo.frequency.setTargetAtTime(tr ? 7 + v.jit*20 : 9, t, .3);
-    v.g.gain.setTargetAtTime(u.vol*(u.moving ? .22 : .09), t, .25);
+    v.whg.gain.setTargetAtTime(turb ? (u.moving ? .018 : .01) : 0, t, .3); v.wh.frequency.setTargetAtTime(turb ? (u.moving ? 1350 : 950) : 120, t, .5);
+    v.lfog.gain.setTargetAtTime(tr && u.moving ? .05 : 0, t, .2); v.lfo.frequency.setTargetAtTime(tr ? 7 + v.jit*20 : 9, t, .3);
+    v.g.gain.setTargetAtTime(u.vol*(u.moving ? .085 : .035), t, .25);
   });
 }
 
@@ -1961,7 +2072,8 @@ function startGame(mode, scn, seed, side, opts){
   APP.mode = mode; APP.side = side; APP.side0 = side; APP.opts = opts; APP.sc = SCEN[scn]; APP.bodies = []; APP.trk.clear(); APP.lastPhase = null; APP.roundShown = false; $('#round').hidden = true; APP.sel.clear(); APP.placing = null; APP.targeting = false; APP.fastNext = false;
   APP.fx = []; APP.wrecks = []; APP.ghosts.clear(); APP.prev = new Map(); APP.ai = {}; APP.pings = []; APP.newUnits.clear(); APP.burning = [];
   PART.length = 0; APP.log = []; $('#log-list').innerHTML = ''; APP.bldAgg = null;
-  const g = makeGame(scn, seed, opts); APP.map = g.map; APP.mapCv = renderMapCanvas(g.map); APP.miniDirty = true;
+  const g = makeGame(scn, seed, opts); APP.map = g.map;
+  APP.rec = { base:{ t:g.map.t.slice(), bst:g.map.bst.slice(), obst:g.map.obst.slice() }, frames:[], events:[], lastF:0, ended:false }; APP.replay = null; APP.mapCv = renderMapCanvas(g.map); APP.miniDirty = true;
   APP.g = mode === 'guest' ? null : g;
   setView(decodeSnap(encodeSnap(g, []))); APP.viewT = performance.now();
   const z = APP.sc.deploy[side][0]; APP.cam.x = z.x + z.w/2; APP.cam.y = z.y + z.h/2; APP.cam.z = .8; clampCam();
@@ -1981,9 +2093,9 @@ function startGame(mode, scn, seed, side, opts){
         acc -= .05;
         if (mode === 'solo') aiStep(APP.g, other(APP.side), .05, APP.ai);
         step(APP.g, .05);
-        if (APP.g.ev.length){ const evs = APP.g.ev.slice(); APP.g.ev.length = 0; if (mode === 'host') APP.netEv.push(...evs); addFx(evs); }
+        if (APP.g.ev.length){ const evs = APP.g.ev.slice(); APP.g.ev.length = 0; if (mode === 'host') APP.netEv.push(...evs); addFx(evs, null, APP.g.t); }
       }
-      const s = encodeSnap(APP.g, []);
+      const s = encodeSnap(APP.g, []); recFrame(s, now);
       setView(decodeSnap(s)); APP.viewT = now;
       if (mode === 'host' && netOpen() && now - APP.lastSnap > 95){
         APP.lastSnap = now; s.ev = APP.netEv; APP.netEv = []; NET.conn.send({ t:'snap', s });
@@ -1993,14 +2105,16 @@ function startGame(mode, scn, seed, side, opts){
   }
 }
 function onSnap(s){
+  if (APP.replay) return;
+  recFrame(s, performance.now());
   const now = performance.now();
   APP.prev = new Map(APP.view ? APP.view.units.map(u => [u.id, u]) : []);
   const old = APP.byId;
   setView(decodeSnap(s)); APP.viewT = now;
-  if (s.ev && s.ev.length) addFx(s.ev, old);
+  if (s.ev && s.ev.length) addFx(s.ev, old, s.t);
   if (APP.view.phase === 'end') showEnd(); else if (APP.view.phase === 'inter') showRound();
 }
-function stopGame(){ try { updateEngines([]); } catch(e){} clearInterval(APP.loop); APP.loop = null; APP.g = null; APP.sc = null; APP.view = null; $('#hud').hidden = true; $('#end').hidden = true; PART.length = 0; }
+function stopGame(){ try { updateEngines([]); } catch(e){} APP.replay = null; document.body.classList.remove('replay'); $('#replay').hidden = true; clearInterval(APP.loop); APP.loop = null; APP.g = null; APP.sc = null; APP.view = null; $('#hud').hidden = true; $('#end').hidden = true; PART.length = 0; }
 
 /* ---------- Журнал ---------- */
 function gridRef(x, y){ const p = v => String(Math.floor(v/500)*5).padStart(2, '0'); return 'кв. ' + p(x) + '-' + p(y); }
@@ -2010,6 +2124,7 @@ function logTime(){
   return fmtT(APP.sc.duration - v.phaseT);
 }
 function addLog(text, cls = '', pos = null, cat = 'battle'){
+  if (APP.replay) return;
   const box = $('#log-list'); if (!box) return;
   const near = box.scrollHeight - box.scrollTop - box.clientHeight < 40;
   const d = document.createElement('div'); d.className = 'le ' + cls; d.dataset.cat = cat;
@@ -2040,7 +2155,15 @@ function addPing(x, y, col, ms = 8000, label = ''){ APP.pings.push({ x, y, col, 
 function camVol(x, y){ const d = Math.hypot(x - APP.cam.x, y - APP.cam.y); return Math.pow(clamp(1 - d/1600, 0, 1), 1.6)*(.55 + .45*clamp(APP.cam.z, 0, 1)); }
 function onScreen(x, y, pad = 60){ const p = toScreen(x, y); return p.x > -pad && p.y > -pad && p.x < cw + pad && p.y < ch + pad; }
 function voxW(){ return clamp(APP.cam.z*1.7, 2.1, 5.6)/APP.cam.z; }
-function addFx(evs, oldById){
+function recFrame(s, now){
+  const R = APP.rec; if (!R || APP.replay) return;
+  if ((s.ph === 'battle' && now - R.lastF >= 400) || (s.ph === 'end' && !R.ended)){
+    R.lastF = now; if (s.ph === 'end') R.ended = true;
+    R.frames.push({ t:s.t, s:{ ...s, ev:null } });
+  }
+}
+function addFx(evs, oldById, t){
+  if (APP.rec && !APP.replay && t !== undefined) for (const e of evs) if (e.e !== 'delay' && e.e !== 'buyfail') APP.rec.events.push({ t, e });
   const now = performance.now(), me = APP.side, map = APP.map;
   const unitOf = id => APP.byId.get(id) || (oldById && oldById.get(id));
   for (const e of evs){
@@ -2112,7 +2235,7 @@ function addFx(evs, oldById){
         break;
       }
       case 'bd': {
-        if (APP.mode === 'guest'){ if (e.s === 2) map.t[e.i] = T.RUBBLE; map.bst[e.i] = e.s; }
+        if (APP.mode === 'guest' || APP.replay){ if (e.s === 2) map.t[e.i] = T.RUBBLE; map.bst[e.i] = e.s; }
         redrawAround(APP.mapCv, map, e.i); APP.miniDirty = true;
         const p = cellCenter(map, e.i);
         if (e.s === 1) spawnDust(p.x, p.y, 3, false);
@@ -2134,6 +2257,9 @@ function addFx(evs, oldById){
         addPing(e.x, e.y, '#e8e2c9', 5000);
         break;
       }
+      case 'delay': if (me === 'fed' && now - (APP.lastDelay || 0) > 6000){ APP.lastDelay = now; addLog('Нет связи с ' + e.n + ' подразд.: приказ дойдёт примерно через ' + e.s + ' с. Держите их в радиусе КШМ или у штаба.', 'neu'); } break;
+      case 'dive': if (e.side === me) addLog('Отряд ушёл в подвал.', 'sys'); break;
+      case 'emerge': if (e.side === me) addLog('Отряд вышел из подвала, ' + gridRef(e.x, e.y) + '.', 'arr', { x:e.x, y:e.y }); break;
       case 'buyfail': if (e.side === me) addLog('Выйти в этом доме не удалось: рядом противник. Очки не списаны.', 'bad', { x:e.x, y:e.y }); break;
       case 'arr':
         if (e.side === me){
@@ -2156,7 +2282,7 @@ function addFx(evs, oldById){
         break;
       }
       case 'ter':
-        if (APP.mode === 'guest') map.t[e.i] = e.v;
+        if (APP.mode === 'guest' || APP.replay) map.t[e.i] = e.v;
         redrawAround(APP.mapCv, map, e.i); APP.miniDirty = true;
         if (e.v === T.RUBBLE){ const p = cellCenter(map, e.i); spawnDust(p.x, p.y, 3, false); }
         break;
@@ -2195,14 +2321,15 @@ const toScreen = (x, y) => ({ x:(x - APP.cam.x)*APP.cam.z + cw/2, y:(y - APP.cam
 
 function viewUnits(){
   const v = APP.view; if (!v) return [];
-  const a = APP.mode === 'guest' ? clamp((performance.now() - APP.viewT)/105, 0, 1) : 1;
+  const interp = APP.mode === 'guest' || APP.replay;
+  const a = APP.replay ? APP.replay.alpha : APP.mode === 'guest' ? clamp((performance.now() - APP.viewT)/105, 0, 1) : 1;
   return v.units.filter(u => !u.carrier).map(u => {
     const p = APP.prev.get(u.id);
-    if (APP.mode === 'guest' && p) return { ...u, rx:p.x + (u.x - p.x)*a, ry:p.y + (u.y - p.y)*a, rh:p.h + angDiff(u.h, p.h)*a, rta:p.ta + angDiff(u.ta, p.ta)*a };
+    if (interp && p) return { ...u, rx:p.x + (u.x - p.x)*a, ry:p.y + (u.y - p.y)*a, rh:p.h + angDiff(u.h, p.h)*a, rta:p.ta + angDiff(u.ta, p.ta)*a };
     return { ...u, rx:u.x, ry:u.y, rh:u.h, rta:u.ta };
   });
 }
-function visibleToMe(u){ const v = APP.view; if (u.side === APP.side) return true; if (!v || v.phase === 'deploy') return false; return u.vis[APP.side]; }
+function visibleToMe(u){ const v = APP.view; if (APP.replay && APP.replay.full) return !u.under || true; if (u.side === APP.side) return true; if (!v || v.phase === 'deploy') return false; return u.vis[APP.side]; }
 const useModels = () => APP.viewMode === 'models' || (APP.viewMode === 'auto' && APP.cam.z >= .5);
 
 /* ---------- Отрисовка ---------- */
@@ -2221,6 +2348,7 @@ function drawUnit(u, now, models, s){
   ctx.lineWidth = (sel ? 3 : 2)/z; ctx.strokeStyle = sel ? REL.sel : own ? REL.own : REL.en;
   if (!own) ctx.setLineDash([6/z, 3/z]); ctx.stroke(); ctx.setLineDash([]);
   let top;
+  if (u.under) ctx.globalAlpha = .4;
   if (d.cls === 'veh'){
     const key = MODEL_OF[u.type];
     drawVehicle(ctx, key, u.side, u.rx, u.ry, u.rh, u.rta, ws, 1);
@@ -2245,6 +2373,7 @@ function drawUnit(u, now, models, s){
     }
     for (const [p, i] of order) drawMan(ctx, u.rx + p[0]*ws*1.2*(u.inB ? .8 : 1.6), u.ry - lift + p[1]*ws*(u.inB ? .7 : 1.9), m, pal, (u.id*7 + i*13) & 255, u.rh, pinned, true, i < tubes);
     top = 4*m + 3*ws + lift;
+    ctx.globalAlpha = 1;
   }
   return top;
 }
@@ -2256,10 +2385,10 @@ function drawBars(u, top, now){
   ctx.fillStyle = hp > .6 ? '#8fbf6a' : hp > .3 ? '#e0b24a' : '#d4533b'; ctx.fillRect(bx, by, bw*hp, bh);
   if (u.supp > 30){ ctx.fillStyle = u.supp >= 70 ? '#f2d36b' : 'rgba(242,211,107,.55)'; ctx.fillRect(bx, by + bh + 1/z, bw*clamp(u.supp/100, 0, 1), 2/z); }
   ctx.textAlign = 'center';
-  const tag = u.immob ? 'ходовая разбита' : u.working === 'mine' ? 'снимает мину' : u.working === 'barr' ? 'разбирает завал' : u.boarding ? 'на посадку' : null;
+  const tag = u.under ? 'в подвале' : u.pend ? 'приказ через ' + u.pend + ' с' : u.nocomm && own ? 'нет связи' : u.immob ? 'ходовая разбита' : u.working === 'mine' ? 'снимает мину' : u.working === 'barr' ? 'разбирает завал' : u.boarding ? 'на посадку' : null;
   if (own){ const cg = APP.view.units.find(c => c.carrier === u.id); if (cg){ ctx.fillStyle = REL.own; ctx.font = `bold ${11/z}px "PT Sans Narrow",sans-serif`; ctx.fillText('десант ' + Math.max(1, Math.ceil(cg.hp/(UT[cg.type].hp/UT[cg.type].men))), u.rx + 26/z, by + 5/z); } }
   if (u.supp >= 70){ ctx.fillStyle = '#f2d36b'; ctx.font = `bold ${12/z}px "PT Sans Narrow",sans-serif`; ctx.fillText('прижат', u.rx, by - 3/z); }
-  else if (tag && (own || u.immob)){ ctx.fillStyle = u.immob ? '#ff9a7a' : '#f2d36b'; ctx.font = `bold ${11/z}px "PT Sans Narrow",sans-serif`; ctx.fillText(tag, u.rx, by - 3/z); }
+  else if (tag && (own || u.immob)){ ctx.fillStyle = u.immob ? '#ff9a7a' : (u.nocomm || u.pend) ? '#c9c4b3' : u.under ? '#9fd0ff' : '#f2d36b'; ctx.font = `bold ${11/z}px "PT Sans Narrow",sans-serif`; ctx.fillText(tag, u.rx, by - 3/z); }
   else if (u.inB){
     const dz = !own && APP.view.units.some(t => t.side === me && APP.sel.has(t.id) && UT[t.type].weapons.some(w => w.lowElev) && Math.hypot(t.x - u.x, t.y - u.y) < 70);
     ctx.fillStyle = dz ? '#ff9a7a' : own ? '#cfe6fa' : '#ffc4bb'; ctx.font = `${11/z}px "PT Sans Narrow",sans-serif`;
@@ -2335,10 +2464,82 @@ function drawSnow(dt){
 }
 
 let lastFrame = performance.now();
+/* ---------- Повтор боя ---------- */
+function frameAt(i){ const f = APP.rec.frames[i]; if (!f.v) f.v = decodeSnap(f.s); return f.v; }
+function replaySilent(e, decals){
+  const m = APP.map;
+  switch (e.e){
+    case 'bd': if (e.s === 2) m.t[e.i] = T.RUBBLE; m.bst[e.i] = e.s; break;
+    case 'ter': m.t[e.i] = e.v; break;
+    case 'boom': decals.push({ k:'crater', x:e.x, y:e.y, r:e.big ? 8 : 5.5 }); break;
+    case 'kill': if (e.v){ m.obst[cellIdx(m, e.x, e.y)] = 1; APP.wrecks.push({ x:e.x, y:e.y, h:e.h/100, ta:e.ta/100, type:e.type, t0:0 }); decals.push({ k:'scorch', x:e.x, y:e.y, r:11 }); } break;
+    case 'man': { const pal = UNIF[e.side]; for (let k = 0; k < e.n; k++){ const a = hr(e.id, k)*7, r = 3 + hr(e.id, k + 9)*9; APP.bodies.push({ x:e.x + Math.cos(a)*r, y:e.y + Math.sin(a)*r, rot:hr(e.id, k + 3)*7, pal, seed:(e.id*7 + k) & 255 }); } break; }
+    case 'civ': if (e.p) for (const q of e.p) APP.bodies.push({ x:q[0], y:q[1], rot:hr(q[2], 1)*7, pal:UNIF.civ, seed:(q[2]*29) & 255 }); break;
+  }
+}
+function replaySeek(t){
+  const R = APP.replay, B = APP.rec.base, m = APP.map;
+  m.t.set(B.t); m.bst.set(B.bst); m.obst.set(B.obst);
+  APP.bodies = []; APP.wrecks = []; APP.burning = []; PART.length = 0; APP.fx = []; APP.ghosts.clear(); APP.pings = [];
+  const decals = []; let i = 0; const ev = APP.rec.events;
+  for (; i < ev.length && ev[i].t <= t; i++) replaySilent(ev[i].e, decals);
+  R.ei = i; R.t = t;
+  APP.mapCv = renderMapCanvas(m); for (const d of decals) addDecal(APP.mapCv, d); APP.miniDirty = true;
+  replayView();
+}
+function replayView(){
+  const R = APP.replay, F = APP.rec.frames; let lo = 0, hi = F.length - 1;
+  while (lo < hi){ const mid = (lo + hi + 1) >> 1; if (F[mid].t <= R.t) lo = mid; else hi = mid - 1; }
+  const f0 = frameAt(lo), f1 = frameAt(Math.min(F.length - 1, lo + 1)), t0 = F[lo].t, t1 = F[Math.min(F.length - 1, lo + 1)].t;
+  R.alpha = t1 > t0 ? clamp((R.t - t0)/(t1 - t0), 0, 1) : 1;
+  APP.prev = new Map(f0.units.map(u => [u.id, u]));
+  APP.view = f1; APP.byId = new Map(f1.units.map(u => [u.id, u]));
+  APP.side = f1.round === 2 ? other(APP.side0) : APP.side0;
+  R.round = f1.round; R.bt = APP.sc.duration - f0.phaseT;
+}
+function enterReplay(){
+  if (!APP.rec || APP.rec.frames.length < 2){ toast('Для повтора пока нет записи боя'); return; }
+  clearInterval(APP.loop); APP.loop = null;
+  const F = APP.rec.frames;
+  APP.replay = { t:F[0].t, t0:F[0].t, t1:F[F.length - 1].t, playing:true, speed:2, full:true, ei:0, alpha:1 };
+  $('#end').hidden = true; $('#round').hidden = true; $('#b-res').hidden = true; $('#replay').hidden = false; document.body.classList.add('replay');
+  APP.sel.clear(); APP.placing = null; APP.targeting = false;
+  replaySeek(APP.replay.t0); updateReplayBar();
+}
+function exitReplay(){
+  const R = APP.replay; if (!R) return;
+  replaySeek(R.t1); APP.replay = null; document.body.classList.remove('replay'); $('#replay').hidden = true;
+  APP.side = APP.view.round === 2 ? other(APP.side0) : APP.side0; $('#end').hidden = false;
+}
+function replayTick(dt){
+  const R = APP.replay; if (!R.playing) return;
+  const nt = Math.min(R.t1, R.t + dt*R.speed), ev = APP.rec.events, batch = [];
+  while (R.ei < ev.length && ev[R.ei].t <= nt){ batch.push(ev[R.ei].e); R.ei++; }
+  R.t = nt; replayView();
+  if (batch.length) addFx(batch, APP.prev);
+  if (R.t >= R.t1) R.playing = false;
+}
+function updateReplayBar(){
+  const R = APP.replay; if (!R) return;
+  $('#rp-play').textContent = R.playing ? 'Пауза' : (R.t >= R.t1 ? 'Сначала' : 'Смотреть');
+  $('#rp-speed').textContent = '×' + R.speed;
+  $('#rp-vis').textContent = R.full ? 'Видно всё' : 'Моё зрение';
+  $('#rp-time').textContent = 'Этап ' + (R.round || 1) + ', ' + fmtT(R.bt || 0);
+  if (document.activeElement !== $('#rp-seek')) $('#rp-seek').value = Math.round((R.t - R.t0)/Math.max(.01, R.t1 - R.t0)*1000);
+}
+$('#rp-play').onclick = () => { const R = APP.replay; if (R.t >= R.t1){ replaySeek(R.t0); R.playing = true; } else R.playing = !R.playing; updateReplayBar(); };
+$('#rp-speed').onclick = () => { const R = APP.replay; R.speed = { 1:2, 2:4, 4:8, 8:1 }[R.speed]; updateReplayBar(); };
+$('#rp-vis').onclick = () => { APP.replay.full = !APP.replay.full; updateReplayBar(); };
+$('#rp-exit').onclick = exitReplay;
+$('#rp-seek').addEventListener('input', e => { const R = APP.replay; replaySeek(R.t0 + (R.t1 - R.t0)*e.target.value/1000); updateReplayBar(); });
+$('#end-replay').onclick = enterReplay;
+setInterval(() => { if (APP.replay) updateReplayBar(); }, 200);
+
 function frame(now){
   const dt = Math.min(.05, (now - lastFrame)/1000); lastFrame = now;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   if (!APP.sc || !APP.view){ drawMenuBg(now); requestAnimationFrame(frame); return; }
+  if (APP.replay) replayTick(dt);
   const K = APP.keys, sp = 700/APP.cam.z*dt;
   if (!K.ControlLeft && !K.ControlRight && document.activeElement !== chatIn){
     if (K.KeyW || K.ArrowUp) APP.cam.y -= sp; if (K.KeyS || K.ArrowDown) APP.cam.y += sp;
@@ -2355,6 +2556,10 @@ function frame(now){
   ctx.imageSmoothingEnabled = z < 1;
   ctx.drawImage(APP.mapCv, 0, 0);
   ctx.imageSmoothingEnabled = true;
+  if (APP.targeting === 'tunnel' && APP.tunnelReach){
+    ctx.fillStyle = 'rgba(79,179,255,.3)';
+    for (const ci of APP.tunnelReach){ ctx.fillRect((ci % APP.map.W)*CELL, Math.floor(ci/APP.map.W)*CELL, CELL, CELL); }
+  }
   if (APP.placing && (APP.placing.startsWith('eng:') || (me === 'chr' && UT[APP.placing] && UT[APP.placing].cls === 'inf'))){
     const eng = APP.placing.startsWith('eng:'), tl = toWorld(0, 0), br = toWorld(cw, ch), m = APP.map, pg = pseudoG();
     const x0 = Math.max(0, Math.floor(tl.x/CELL)), x1 = Math.min(m.W - 1, Math.ceil(br.x/CELL)), y0 = Math.max(0, Math.floor(tl.y/CELL)), y1 = Math.min(m.H - 1, Math.ceil(br.y/CELL));
@@ -2381,7 +2586,7 @@ function frame(now){
   if (models){ const bm = voxW()*1.6; for (const b of APP.bodies) if (inView(b.x, b.y)) drawBody(ctx, b.x, b.y, b.rot, b.pal, b.seed, bm); }
   else { ctx.fillStyle = 'rgba(40,35,30,.55)'; for (const b of APP.bodies) if (inView(b.x, b.y)) ctx.fillRect(b.x - 1.5/z, b.y - 1.5/z, 3/z, 3/z); }
   for (const w of APP.wrecks) drawWreck(w, models);
-  for (const m of v.mines || []){ const ms = m[3] ? 'chr' : 'fed', own = ms === me, rev = m[4] & (me === 'fed' ? 1 : 2); if (own || rev) drawMine(m[1], m[2], own, z); }
+  for (const m of v.mines || []){ const ms = m[3] ? 'chr' : 'fed', own = ms === me, rev = m[4] & (me === 'fed' ? 1 : 2) || (APP.replay && APP.replay.full); if (own || rev) drawMine(m[1], m[2], own, z); }
   // мирные жители рядом с нашими подразделениями
   const units = viewUnits(), mine = units.filter(u => u.side === me);
   if (models && v.civs) for (const c of v.civs){
@@ -2407,6 +2612,10 @@ function frame(now){
   for (const u of shown) if (u.side === me && APP.sel.has(u.id) && u.dest){
     ctx.strokeStyle = u.fast ? 'rgba(240,200,90,.85)' : 'rgba(240,235,210,.75)'; ctx.lineWidth = 1.5/z; ctx.setLineDash([5/z, 5/z]); ctx.beginPath(); ctx.moveTo(u.rx, u.ry); ctx.lineTo(u.dest.x, u.dest.y); ctx.stroke(); ctx.setLineDash([]);
     ctx.fillStyle = 'rgba(240,235,210,.8)'; ctx.beginPath(); ctx.arc(u.dest.x, u.dest.y, 3/z, 0, 7); ctx.fill();
+  }
+  if (me === 'fed' && v.phase !== 'end') for (const u of shown) if (u.side === me && UT[u.type].comm){
+    ctx.strokeStyle = 'rgba(120,200,255,.35)'; ctx.lineWidth = 1.5/z; ctx.setLineDash([10/z, 8/z]); ctx.beginPath(); ctx.arc(u.rx, u.ry, UT[u.type].comm, 0, 7); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(160,215,255,.8)'; ctx.font = `${11/z}px "PT Sans Narrow",sans-serif`; ctx.textAlign = 'center'; ctx.fillText('радиосвязь', u.rx, u.ry - UT[u.type].comm - 4/z);
   }
   for (const u of shown) if (u.side === me && u.afire && APP.sel.has(u.id)){ ctx.strokeStyle = 'rgba(255,138,58,.7)'; ctx.lineWidth = 1.2/z; ctx.setLineDash([3/z, 4/z]); ctx.beginPath(); ctx.moveTo(u.rx, u.ry); ctx.lineTo(u.afire.x, u.afire.y); ctx.stroke(); ctx.setLineDash([]); ctx.beginPath(); ctx.arc(u.afire.x, u.afire.y, 8/z, 0, 7); ctx.stroke(); }
   for (const u of shown) if (u.side === me && APP.sel.has(u.id) && UT[u.type].weapons.some(w => w.lowElev)){
@@ -2612,6 +2821,11 @@ addEventListener('mouseup', e => {
       const t = APP.targeting; APP.targeting = false;
       if (t === 'smoke'){ sendCmd({ c:'asmoke', x:w.x, y:w.y }); addLog(AB2[me].name + ': запрошены, ' + gridRef(w.x, w.y) + '.', 'sys', { x:w.x, y:w.y }); }
       else if (t === 'flare') sendCmd({ c:'flare', x:w.x, y:w.y });
+      else if (t === 'tunnel'){
+        const ci = cellIdx(APP.map, w.x, w.y);
+        if (!APP.tunnelReach || !APP.tunnelReach.has(ci)){ toast('Туда подвалами не пройти: только дома этого квартала'); APP.targeting = 'tunnel'; return; }
+        sendCmd({ c:'tunnel', ids:tunnelUnits().map(u => u.id), x:w.x, y:w.y }); addPing(w.x, w.y, REL.own, 1500);
+      }
       else if (t === 'afire'){ sendCmd({ c:'afire', ids:selOwn().map(u => u.id), x:w.x, y:w.y }); addPing(w.x, w.y, '#ff8a3a', 1500); }
       else { sendCmd({ c:'ability', x:w.x, y:w.y }); addLog(AB[me].name + ': огонь запрошен, ' + gridRef(w.x, w.y) + '.', 'sys', { x:w.x, y:w.y }); }
       updateHud(); return;
@@ -2627,6 +2841,7 @@ addEventListener('mouseup', e => {
   updateSel();
 });
 function rightClick(e){
+  if (APP.replay) return;
   const me = APP.side, v = APP.view;
   if (APP.placing || APP.targeting){ APP.placing = null; APP.targeting = false; updateHud(); return; }
   const ids = [...APP.sel].filter(id => APP.byId.has(id) && APP.byId.get(id).side === me);
@@ -2657,6 +2872,7 @@ cv.addEventListener('wheel', e => {
 }, { passive:false });
 addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT') return;
+  if (APP.replay){ APP.keys[e.code] = true; if (e.code === 'Space'){ e.preventDefault(); $('#rp-play').click(); } if (e.code === 'Escape') exitReplay(); return; }
   sndInit();
   APP.keys[e.code] = true; if (!APP.sc || !APP.view) return;
   const ids = [...APP.sel];
@@ -2669,6 +2885,7 @@ addEventListener('keydown', e => {
   if (e.code === 'KeyE') toggleAbility('flare');
   if (e.code === 'KeyG') unitSmoke();
   if (e.code === 'KeyU') unloadSel();
+  if (e.code === 'KeyB') toggleTunnel();
   if (e.code === 'KeyT'){ if (APP.view.phase === 'battle' && selOwn().length){ APP.targeting = APP.targeting === 'afire' ? false : 'afire'; APP.placing = null; updateHud(); } }
   if (e.code === 'KeyV') cycleView();
   if (e.code === 'KeyM') toggleSound();
@@ -2695,6 +2912,15 @@ function toggleAbility(kind){
   if (S.p < cost){ toast('Нужно ' + cost + ' очков'); return; }
   APP.targeting = APP.targeting === kind ? false : kind; APP.placing = null; updateHud();
 }
+function tunnelUnits(){ return selOwn().filter(u => APP.side === 'chr' && UT[u.type].cls === 'inf' && !u.under && isCellar(APP.map, cellIdx(APP.map, u.x, u.y))); }
+function toggleTunnel(){
+  if (APP.view.phase !== 'battle') return;
+  const us = tunnelUnits();
+  if (!us.length){ toast(APP.side === 'chr' ? 'Выберите пехоту, стоящую в жилом доме' : 'Подвалами ходят только бойцы ВС ЧРИ'); return; }
+  if (APP.targeting === 'tunnel'){ APP.targeting = false; updateHud(); return; }
+  APP.tunnelReach = new Set(); for (const u of us) for (const k of cellarReach(APP.map, cellIdx(APP.map, u.x, u.y)).keys()) APP.tunnelReach.add(k);
+  APP.targeting = 'tunnel'; APP.placing = null; updateHud();
+}
 function selOwn(){ return [...APP.sel].map(id => APP.byId.get(id)).filter(u => u && u.side === APP.side && !u.carrier); }
 function unitSmoke(){
   const us = selOwn().filter(u => u.smk > 0);
@@ -2710,6 +2936,7 @@ function unloadSel(){
 /* ---------- Интерфейс ---------- */
 function fmtT(s){ s = Math.max(0, Math.ceil(s)); return Math.floor(s/60) + ':' + String(s % 60).padStart(2, '0'); }
 function toast(msg, ms = 3200, cls = ''){
+  if (APP.replay && !APP.replayToast) return;
   const box = $('#toasts'); const d = document.createElement('div'); d.className = 'toast ' + cls; d.textContent = msg; box.appendChild(d);
   while (box.children.length > 3) box.firstChild.remove();
   setTimeout(() => d.remove(), ms);
@@ -2776,6 +3003,7 @@ function updateHud(){
   const so = selOwn();
   $('#b-smoke').hidden = v.phase !== 'battle' || !so.some(u => u.smk > 0);
   $('#b-unload').hidden = !so.some(u => v.units.some(c => c.carrier === u.id));
+  const tb = $('#b-tunnel'); tb.hidden = v.phase !== 'battle' || me !== 'chr' || !tunnelUnits().length; tb.classList.toggle('on', APP.targeting === 'tunnel');
   const af = $('#b-afire'); af.hidden = v.phase !== 'battle' || !so.length; af.classList.toggle('on', APP.targeting === 'afire');
   const fb = $('#b-fast'); fb.hidden = v.phase !== 'battle'; fb.classList.toggle('on', APP.fastNext);
   $('#b-stop').hidden = v.phase !== 'battle';
@@ -2787,6 +3015,7 @@ function updateHud(){
     : APP.placing && APP.placing.startsWith('eng:') ? 'Щелчок по улице или двору в своей зоне. Правый щелчок по поставленному убирает его и возвращает очки.'
     : APP.targeting === 'smoke' ? 'Щёлкните по карте: дымовая завеса встанет через несколько секунд и закроет обзор примерно на минуту.'
     : APP.targeting === 'flare' ? 'Щёлкните по карте: ракета осветит круг радиусом 260 м на полминуты. Свет видят обе стороны.'
+    : APP.targeting === 'tunnel' ? 'Подсвечены дома квартала, связанные подвалами и проходами. Щёлкните дом: отряд пройдёт под землёй невидимым и неуязвимым и выйдет там.'
     : APP.targeting === 'afire' ? 'Щёлкните по дому или точке: выбранные будут 40 с вести огонь туда, даже не видя противника. Фугасы рушат стены, пулемёты прижимают.'
     : APP.placing && v.phase === 'battle' ? 'Подсвечены жилые дома, где отряд может выйти из подвала: не ближе 220 м к противнику. Щёлкните карточку ещё раз, чтобы вызвать его с края карты.'
     : APP.placing && me === 'chr' && UT[APP.placing] && UT[APP.placing].cls === 'inf' ? 'Пехоту можно ставить в своей зоне или в любом подсвеченном жилом доме.'
@@ -2806,7 +3035,9 @@ function updateSel(){
     const st = [u.immob ? 'ходовая разбита, машина обездвижена' : null, u.working === 'mine' ? 'снимает мину' : u.working === 'barr' ? 'разбирает баррикаду' : null, u.boarding ? 'идёт на посадку' : null,
       u.supp >= 70 ? 'прижат огнём' : u.supp > 30 ? 'под огнём' : null, u.inB ? 'в здании' : null, u.fast ? 'бегом' : u.moving ? 'движется' : 'на месте'].filter(Boolean).join(', ');
     const cg = v.units.find(c => c.carrier === u.id);
-    const elev = d.weapons.some(w => w.lowElev) ? '<p class="arm">Пушка не поднимается на верхние этажи ближе 70 м (красный круг). Отойдите дальше или приведите БМП-2 и «Шилку».</p>' : '';
+    const comm = u.side === 'fed' ? (d.comm ? '<p class="arm">Радиус связи 450 м: отряды внутри получают приказы сразу.</p>' : u.nocomm ? '<p class="arm">Нет связи: приказы доходят с задержкой 6–10 с.</p>' : '') : '';
+    const cel = u.side === 'chr' && d.cls === 'inf' ? (u.under ? '<p class="arm">Идёт подвалами, противник его не видит.</p>' : isCellar(APP.map, cellIdx(APP.map, u.x, u.y)) ? '<p class="arm">В жилом доме: можно уйти подвалами (B).</p>' : '') : '';
+    const elev = comm + cel + (d.weapons.some(w => w.lowElev) ? '<p class="arm">Пушка не поднимается на верхние этажи ближе 70 м (красный круг). Отойдите дальше или приведите БМП-2 и «Шилку».</p>' : '');
     const extra = elev + (d.cap ? `<p class="arm">Десант: ${cg ? UT[cg.type].name + ', ' + Math.max(1, Math.ceil(cg.hp/(UT[cg.type].hp/UT[cg.type].men))) + ' чел. Высадить: U' : 'пусто. Выберите пехоту и щёлкните правой по машине'}</p>` : '') + (d.smk ? `<p class="arm">Дымовых зарядов: ${u.smk} (G)</p>` : '');
     const men = d.cls === 'inf' ? `, в строю ${Math.max(1, Math.ceil(u.hp/(d.hp/d.men)))} из ${d.men}` : '';
     const ws = d.weapons.map((w, i) => `<li>${w.n}<span>${w.r} м${u.ammo[i] >= 0 ? ', выстрелов: ' + u.ammo[i] : ''}</span></li>`).join('');
@@ -2833,6 +3064,7 @@ $('#b-asmoke').onclick = () => toggleAbility('smoke');
 $('#b-flare').onclick = () => toggleAbility('flare');
 $('#b-smoke').onclick = unitSmoke;
 $('#b-unload').onclick = unloadSel;
+$('#b-tunnel').onclick = toggleTunnel;
 $('#b-afire').onclick = () => { if (APP.view.phase === 'battle' && selOwn().length){ APP.targeting = APP.targeting === 'afire' ? false : 'afire'; updateHud(); } };
 $('#b-fast').onclick = () => { APP.fastNext = !APP.fastNext; updateHud(); };
 $('#b-stop').onclick = () => { if (APP.sel.size) sendCmd({ c:'stop', ids:[...APP.sel] }); };
