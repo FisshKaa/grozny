@@ -18,7 +18,7 @@
 window.GAME_REPO = 'FisshKaa/grozny';
 window.GAME_FILE = '';             // пусто — все коммиты репозитория; 'index.html' — только коммиты с этим файлом
 window.GAME_BRANCH = '';
-window.GAME_BUILD = '20260926a';   // меняйте при обновлении, чтобы браузеры не брали старые скрипты из кэша           // ветка; пусто — ветка по умолчанию
+window.GAME_BUILD = '20260926b';   // меняйте при обновлении, чтобы браузеры не брали старые скрипты из кэша           // ветка; пусто — ветка по умолчанию
 </script>
 <canvas id="cv" aria-label="Тактическая карта"></canvas>
 
@@ -32,9 +32,9 @@ window.GAME_BUILD = '20260926a';   // меняйте при обновлении
     </div>
     <div class="row"><span id="h-me" class="me"></span><button id="b-menu">Меню</button></div>
   </div>
-  <div id="deck"><header><div id="h-pts"></div></header><div id="deck-list"></div></div>
+  <div id="deck"><header><div id="h-pts"></div><button id="deck-min" class="pmin" title="Свернуть" aria-expanded="true">–</button></header><div id="deck-list"></div></div>
   <div id="log" data-filter="all">
-    <div class="tabs"><button data-f="all" class="on">Все</button><button data-f="battle">Бой</button><button data-f="chat" id="log-tab-chat">Чат</button></div>
+    <div class="tabs"><button data-f="all" class="on">Все</button><button data-f="battle">Бой</button><button data-f="chat" id="log-tab-chat">Чат</button><button id="log-min" class="pmin" title="Свернуть" aria-expanded="true">–</button></div>
     <div id="log-list" aria-live="polite"></div>
     <input id="chat-in" maxlength="200" placeholder="Сообщение сопернику (Enter)" autocomplete="off" aria-label="Сообщение в чат">
   </div>
@@ -162,6 +162,8 @@ window.GAME_BUILD = '20260926a';   // меняйте при обновлении
         <dt>X</dt><dd>режим засады: огонь только в упор, по приказу или в ответ</dd>
         <dt>I, C</dt><dd>выбрать всю свою пехоту или всю технику на экране (с Shift — добавить)</dd>
         <dt>WASD, стрелки</dt><dd>двигать карту; колесо — масштаб; средняя кнопка или пробел с левой — перетаскивание</dd>
+        <dt>J, K</dt><dd>свернуть или развернуть журнал и колоду (или кнопки «–» на панелях)</dd>
+        <dt>Правая при расстановке</dt><dd>в своей зоне — переставить отряд, за зоной — задать маршрут на начало боя (Shift — точка в очередь)</dd>
         <dt>Delete</dt><dd>при расстановке убрать выбранные отряды и вернуть очки</dd>
         <dt>Enter</dt><dd>написать в чат; Esc — вернуться к карте</dd>
         <dt>R</dt><dd>полупрозрачные крыши; удерживайте Alt, чтобы заглянуть под крыши у курсора</dd>
