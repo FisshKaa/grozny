@@ -18,7 +18,7 @@
 window.GAME_REPO = 'FisshKaa/grozny';
 window.GAME_FILE = '';             // пусто — все коммиты репозитория; 'index.html' — только коммиты с этим файлом
 window.GAME_BRANCH = '';           // ветка; пусто — ветка по умолчанию
-window.GAME_BUILD = '20260930a';   // меняйте при обновлении, чтобы браузеры не брали старые скрипты из кэша
+window.GAME_BUILD = '20260930b';   // меняйте при обновлении, чтобы браузеры не брали старые скрипты из кэша
 /* ===== Сеть (необязательно) =====
    TURN-сервер помогает, когда прямое соединение не устанавливается из-за NAT.
    Пример: window.GAME_TURN = [{ urls:'turn:адрес:3478', username:'логин', credential:'пароль' }];
@@ -86,7 +86,7 @@ window.GAME_PEER = null;
   <p class="meta" id="mu-note" aria-live="polite"></p>
   <p class="meta" id="mu-store">Треки хранятся только в этом браузере и слышны только вам. У друга свой плейлист. Клавиши: N — следующий, Shift+N — предыдущий, P — пауза.</p>
 </div>
-<div id="tut" hidden role="region" aria-label="Обучение"><div class="tut-h"><span id="tut-n"></span><b id="tut-t"></b></div><p id="tut-d"></p><div class="tut-b"><button id="tut-skip">Пропустить шаг</button><button id="tut-exit">Выйти из обучения</button></div></div>
+<div id="tut" hidden role="region" aria-label="Обучение"><div class="tut-h"><span id="tut-n"></span><b id="tut-t"></b></div><p id="tut-d"></p><div class="tut-b"><button id="tut-skip">Пропустить шаг</button></div></div>
 <div id="reconn" hidden role="alert"><span id="reconn-t">Переподключаемся…</span><button id="reconn-cancel">Отмена</button></div>
 <div id="replay" hidden><button id="rp-play">Пауза</button><button id="rp-speed">×2</button><input id="rp-seek" type="range" min="0" max="1000" value="0" aria-label="Время повтора"><span id="rp-time"></span><button id="rp-vis">Видно всё</button><button id="rp-exit">Выйти из повтора</button></div>
 <div id="round" hidden><div class="box"><div id="round-body"></div></div></div>
